@@ -129,6 +129,8 @@ sub parseLine {
   my $line = $_[ 0 ];
 
   my @words = split( " ", $line );
+  map { s/\e\[?.*?[\@-~]//g } @words; # strip ANSI codes
+
   my %todo;
   $todo{ 'src' } = $line;
 
