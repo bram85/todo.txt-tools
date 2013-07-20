@@ -49,7 +49,7 @@ sub getImportance {
       my $diff = $due - $now;
 
       # between Friday 0:00 and Monday 23:59 (a span of less than 4 days)
-      $importance += 1 if $now->wday == 6 && $due->wday == 2 && $diff->days < 4;
+      $importance += 1 if ( $now->wday == 6 || $now->wday == 7 ) && $due->wday == 2 && $diff->days < 4;
     }
   }
 
