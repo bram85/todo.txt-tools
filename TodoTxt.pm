@@ -56,6 +56,9 @@ sub isStartDate {
 sub getFirstData {
   my ( $todo, $words ) = @_;
 
+  # remove task number
+  shift @$words if defined( $ENV{'TODOTXT_VERBOSE'} );
+
   if ( $words->[ 0 ] eq 'x' ) {
     $todo->{ 'completed' } = 1;
     shift @$words;
