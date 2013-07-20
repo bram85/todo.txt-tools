@@ -161,7 +161,7 @@ sub getTodos {
   return \@todos;
 }
 
-while ( my $line = <> ) {
+while ( my $line = <STDIN> ) {
   push( @todos, parseLine( $line ) );
 }
 
