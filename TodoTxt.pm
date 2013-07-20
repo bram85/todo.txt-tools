@@ -8,6 +8,10 @@ use Time::Seconds;
 
 my @todos;
 
+sub parseDate {
+  return Time::Piece->strptime( $_[ 0 ], "%Y-%m-%d" );
+}
+
 sub isPriority {
   return $_[ 0 ] =~ /^\([A-Z]\)$/;
 }
@@ -83,7 +87,7 @@ sub getFirstData {
 }
 
 sub getDaysDiff {
-  my $due = Time::Piece->strptime( $_[ 0 ], "%Y-%m-%d" );
+  my $due = parseDate( $_[ 0 ] );
   my $now = localtime;
 
   my $diff = $due - $now;
