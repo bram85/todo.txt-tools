@@ -82,12 +82,17 @@ sub getFirstData {
   }
 }
 
-sub getDaysLeft {
+sub getDaysDiff {
   my $due = Time::Piece->strptime( $_[ 0 ], "%Y-%m-%d" );
   my $now = localtime;
 
   my $diff = $due - $now;
   return $diff->days;
+}
+
+sub getDaysLeft {
+  my $todo = $_[ 0 ];
+  return getDaysDiff( $todo->{ 'due' } );
 }
 
 sub hasStartDate {
@@ -100,12 +105,12 @@ sub hasDueDate {
 
 sub isOverdue {
   my $todo = $_[ 0 ];
-  return !hasDueDate( $todo ) || getDaysLeft( $todo->{ 'due' } ) < 0;
+  return !hasDueDate( $todo ) || getDaysLeft( $todo ) < 0;
 }
 
 sub isActive {
   my $todo = $_[ 0 ];
-  return !hasStartDate( $todo ) || getDaysLeft( $_[ 0 ]->{ 'start' } ) < 0;
+  return !hasStartDate( $todo ) || getDaysDiff( $_[ 0 ]->{ 'start' } ) < 0;
 }
 
 sub hasPriority {

@@ -24,8 +24,7 @@ sub getImportance {
   $importance++ if $todo->{ 'tags' }->{ 'star' } == 1;
 
   if ( defined( $todo->{ 'tags' }->{ 'due' } ) ) {
-    my $due = $todo->{ 'tags' }->{ 'due' };
-    my $daysLeft = TodoTxt::getDaysLeft( $due );
+    my $daysLeft = TodoTxt::getDaysLeft( $todo );
 
     $importance += 1 if ( $daysLeft > 7 && $daysLeft <= 14 );
     $importance += 2 if ( $daysLeft > 2 && $daysLeft <= 7 );
