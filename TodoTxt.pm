@@ -100,8 +100,22 @@ sub getDaysLeft {
   return $diff->days;
 }
 
+sub hasStartDate {
+  return defined( $_[ 0 ]->{ 'start' } );
+}
+
+sub hasDueDate {
+  return defined( $_[ 0 ]->{ 'due' } );
+}
+
 sub isOverdue {
-  return getDaysLeft( $_[ 0 ]->{ 'due' } ) < 0;
+  my $todo = $_[ 0 ];
+  return !hasDueDate( $todo ) || getDaysLeft( $todo->{ 'due' } ) < 0;
+}
+
+sub isActive {
+  my $todo = $_[ 0 ];
+  return !hasStartDate( $todo ) || getDaysLeft( $_[ 0 ]->{ 'start' } ) < 0;
 }
 
 sub parseLine {
