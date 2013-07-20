@@ -2,12 +2,23 @@
 
 use TodoTxt;
 
+my %priority = (
+  'A' => 3,
+  'B' => 2,
+  'C' => 1
+);
+
+sub getPriorityValue {
+  $_[ 0 ] =~ /([A-C])/;
+  return defined( $priority{ $1 } ) ? $priority{ $1 } : 0;
+}
+
 sub getImportance {
   my $todo = $_[ 0 ];
 
   my $importance = 2;
 
-  $importance += $todo->{ 'priority' };
+  $importance += getPriorityValue( $todo->{ 'priority' } );
 
   # auto-viv is not a problem here
   $importance++ if $todo->{ 'tags' }->{ 'star' } == 1;

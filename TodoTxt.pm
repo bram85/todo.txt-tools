@@ -8,19 +8,8 @@ use Time::Seconds;
 
 my %todos;
 
-my %priority = (
-  'A' => 3,
-  'B' => 2,
-  'C' => 1
-);
-
 sub isPriority {
   return $_[ 0 ] =~ /^\([A-Z]\)$/;
-}
-
-sub getPriorityValue {
-  $_[ 0 ] =~ /([A-C])/;
-  return defined( $priority{ $1 } ) ? $priority{ $1 } : 0;
 }
 
 sub isDate {
@@ -78,7 +67,8 @@ sub getFirstData {
     }
   }
   elsif ( isPriority( $words->[ 0 ] ) ) {
-    $todo->{ 'priority' } = getPriorityValue( $words->[ 0 ] );
+    $words->[ 0 ] =~ /\((.)\)/;
+    $todo->{ 'priority' } = $1;
     shift @$words;
 
     if ( isDate( $words->[ 0 ] ) ) {
@@ -116,6 +106,11 @@ sub isOverdue {
 sub isActive {
   my $todo = $_[ 0 ];
   return !hasStartDate( $todo ) || getDaysLeft( $_[ 0 ]->{ 'start' } ) < 0;
+}
+
+sub hasPriority {
+  my $todo = $_[ 0 ];
+  return defined( $_[ 0 ]->{ 'priorityText' } );
 }
 
 sub parseLine {
