@@ -1,5 +1,11 @@
 #!/usr/bin/perl
 
+use Getopt::Std;
+use Time::Piece;
+
+my %options;
+getopts( 'w', \%options );
+
 use TodoTxt;
 
 my %priority = (
@@ -31,6 +37,20 @@ sub getImportance {
     $importance += 3 if ( $daysLeft > 1 && $daysLeft <= 2 );
     $importance += 5 if ( $daysLeft > 0 && $daysLeft <= 1 );
     $importance += 6 if ( $daysLeft < 0 );
+
+    my $ignoreWeekends = defined( $options{ 'w' } );
+
+    if ( $ignoreWeekends ) {
+      # add compensation when the next working day is a Monday, add one to
+      # importance
+
+      my $now = localtime();
+      my $due = Time::Piece->strptime( $todo->{ 'due' }, "%Y-%m-%d" );
+      my $diff = $due - $now;
+
+      # between Friday 0:00 and Monday 23:59 (a span of less than 4 days)
+      $importance += 1 if $now->wday == 6 && $due->wday == 2 && $diff->days < 4;
+    }
   }
 
   return $importance;
