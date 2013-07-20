@@ -176,7 +176,6 @@ while ( my $line = <> ) {
 
 foreach my $t ( sort { getImportance( $b ) <=> getImportance( $a ) } values %todos ) {
   print $t->{ 'src' };
-  print getImportance( $t ) . "\n";
 }
 
 exit 0;
