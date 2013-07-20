@@ -36,9 +36,15 @@ sub getImportance {
   return $importance;
 }
 
+sub sortTodos {
+  return getImportance( $b ) <=> getImportance( $a )
+  || getPriorityValue( $b->{ 'priority' } ) <=> getPriorityValue( $a->{ 'priority' } )
+  || TodoTxt::getDaysLeft( $b ) <=> TodoTxt::getDaysLeft( $a );
+}
+
 my $todos = TodoTxt::getTodos();
 
-foreach my $t ( sort { getImportance( $b ) <=> getImportance( $a ) } @$todos ) {
+foreach my $t ( sort sortTodos @$todos ) {
   print $t->{ 'src' };
 }
 
