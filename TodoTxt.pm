@@ -6,7 +6,7 @@ use strict;
 use Time::Piece;
 use Time::Seconds;
 
-my %todos;
+my @todos;
 
 sub isPriority {
   return $_[ 0 ] =~ /^\([A-Z]\)$/;
@@ -110,7 +110,7 @@ sub isOverdue {
 
 sub isActive {
   my $todo = $_[ 0 ];
-  return !hasStartDate( $todo ) || getDaysDiff( $_[ 0 ]->{ 'start' } ) < 0;
+  return !hasStartDate( $todo ) || getDaysDiff( $todo->{ 'start' } ) < 0;
 }
 
 sub hasPriority {
@@ -158,13 +158,11 @@ sub parseLine {
 }
 
 sub getTodos {
-  return \%todos;
+  return \@todos;
 }
 
-my $count = 1;
 while ( my $line = <> ) {
-  $todos{ $count } = parseLine( $line );
-  $count++;
+  push( @todos, parseLine( $line ) );
 }
 
 1;

@@ -38,7 +38,7 @@ sub getImportance {
 
 my $todos = TodoTxt::getTodos();
 
-foreach my $t ( sort { getImportance( $b ) <=> getImportance( $a ) } values %$todos ) {
+foreach my $t ( sort { getImportance( $b ) <=> getImportance( $a ) } @$todos ) {
   print $t->{ 'src' };
 }
 

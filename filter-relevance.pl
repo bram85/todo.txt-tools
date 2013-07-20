@@ -19,7 +19,7 @@ use TodoTxt;
 # * There is no due date
 
 my $todos = TodoTxt::getTodos();
-foreach my $todo ( values %$todos ) {
+foreach my $todo ( @$todos ) {
   next if $todo->{ 'completed' };
   next if !TodoTxt::isActive( $todo );
 
