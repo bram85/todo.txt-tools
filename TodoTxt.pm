@@ -100,6 +100,10 @@ sub getDaysLeft {
   return $diff->days;
 }
 
+sub isOverdue {
+  return getDaysLeft( $_[ 0 ]->{ 'due' } ) < 0;
+}
+
 sub parseLine {
   my $line = $_[ 0 ];
 
