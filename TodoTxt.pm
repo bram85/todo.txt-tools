@@ -115,22 +115,15 @@ sub parseLine {
 
   while ( my $word = shift @words ) {
     my ( $key, $value ) = isKeyValue( $word );
-    if ( $key ) {
-      $todo{ 'tags' }->{ $key } = $value;
-      next;
-    }
+    $todo{ 'tags' }->{ $key } = $value if $key;
 
     my $startDate = isStartDate( $word );
-    if ( $startDate ) {
-        $todo{ 'start' } = $word;
-        next;
-    }
+    $todo{ 'start' } = $startDate if $startDate;
 
     my $dueDate = isDueDate( $word );
-    if ( $dueDate ) {
-      $todo{ 'due' } = $word;
-      next;
-    }
+    $todo{ 'due' } = $dueDate if $dueDate;
+
+    next if $key; # it was some other key:value, we got it
 
     if ( isContext( $word ) ) {
       $todo{ 'context' }->{ getContext( $word ) } = 1;
