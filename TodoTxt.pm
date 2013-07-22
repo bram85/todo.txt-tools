@@ -201,4 +201,19 @@ sub readTodos {
   return \@todos;
 }
 
+sub writeTodos {
+  my $filename = $_[ 0 ];
+
+  my $fh;
+  if ( defined( $filename ) ) {
+    open( $fh, ">$filename" ) or die "Cannot write to $filename.";
+  } else {
+    $fh = *STDOUT;
+  }
+
+  print $fh $_->{ 'src' } foreach @todos;
+
+  close( $fh ) if defined( $filename );;
+}
+
 1;
