@@ -24,6 +24,11 @@ use Time::Seconds;
 
 my @todos;
 
+sub getTodo {
+  my $taskNumber = $_[ 0 ];
+  return $taskNumber > 0 && $taskNumber <= scalar @todos ? $todos[ $taskNumber - 1 ] : 0;
+}
+
 sub parseDate {
   return Time::Piece->strptime( $_[ 0 ], "%Y-%m-%d" );
 }
