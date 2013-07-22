@@ -1,0 +1,111 @@
+#!/usr/bin/perl
+
+use strict;
+
+use File::Spec;
+
+use lib '..';
+use TodoTxt;
+
+sub usage {
+  print STDERR <<END;
+Usage: todo.sh tag ITEM# [TAGNAME [VALUE]]";
+
+       When TAGNAME and VALUE are omitted, the list of tags will be shown.
+       When VALUE is omitted, the tag will be deleted.
+END
+
+  exit 1;
+}
+
+sub listTags {
+  my $todo = $_[ 0 ];
+  my $tags = $todo->{ 'tags' };
+
+  my $maxLength = 0;
+  foreach my $key ( keys %$tags ) {
+    my $length = length( $key );
+    $maxLength = $length if $length > $maxLength;
+  }
+
+  foreach my $key ( sort keys %$tags ) {
+    my $padding = "";
+    # $padding .= " " for ( $i = 0; $i < $maxLength - length( $key ); ++$i );
+    $padding = " " x ( $maxLength - length( $key ) );
+
+    printf( "%s%s = %s\n", $key, $padding, $tags->{ $key } );
+  }
+}
+
+sub addTag {
+  my ( $todo, $key, $value ) = @_;
+
+  $todo->{ 'src' } =~ s/$/ $key:$value/;
+  $todo->{ 'tags' }->{ $key } = $value;
+}
+
+sub modifyTag {
+  my ( $todo, $key, $value ) = @_;
+
+  $todo->{ 'src' } =~ s/\b$key:\S+\b/$key:$value/;
+  $todo->{ 'tags' }->{ $key } = $value;
+}
+
+sub deleteTag {
+  my $todo = $_[ 0 ];
+  my $key = $_[ 1 ];
+
+  $todo->{ 'src' } =~ s/\s?$key:\S+\b//;
+  delete $todo->{ 'tags' }->{ $key };
+}
+
+sub confirmDelete {
+  my $tag = $_[ 0 ];
+
+  print "Delete tag '$tag' [n]? ";
+  my $answer = <STDIN>;
+  chomp $answer;
+
+  return $answer =~ /^y(es)?$/i;
+}
+
+my $taskNumber = $ARGV[ 1 ];
+usage() if $taskNumber !~ /^\d+$/;
+
+my ( $key, $value ) = TodoTxt::isKeyValue( $ARGV[ 2 ] );
+if ( !$key ) {
+  $key = $ARGV[ 2 ];
+  $value = $ARGV[ 3 ];
+}
+
+my $force = $ENV{ 'TODOTXT_FORCE' };
+
+my $filename = $ENV{ 'TODO_DIR' } . "/todo.txt";
+TodoTxt::readTodos( $filename );
+
+my $todo = TodoTxt::getTodo( $taskNumber );
+my $hasKey = defined( $todo->{ 'tags' }->{ $key } );
+
+die "Item $taskNumber does not exist." unless $todo;
+
+if ( !defined( $key ) && !defined( $value ) ) {
+  listTags( $todo );
+  exit 0;
+}
+elsif ( !$hasKey && defined( $value ) ) {
+  addTag( $todo, $key, $value );
+}
+elsif( defined( $todo->{ 'tags' }->{ $key } ) ) {
+  if ( defined( $value ) ) {
+    modifyTag( $todo, $key, $value );
+  }
+  else {
+    deleteTag( $todo, $key ) if $force || confirmDelete( $key );
+  }
+}
+else {
+  print STDERR "Tag $key does not exist.\n";
+}
+
+TodoTxt::writeTodos( $filename );
+
