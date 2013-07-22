@@ -182,12 +182,23 @@ sub parseLine {
   return \%todo;
 }
 
-sub getTodos {
-  return \@todos;
-}
+sub readTodos {
+  my $filename = $_[ 0 ];
 
-while ( my $line = <STDIN> ) {
-  push( @todos, parseLine( $line ) );
+  my $fh;
+  if ( defined( $filename ) ) {
+    open( $fh, "<$filename" ) or die "Cannot open $filename.";
+  } else {
+    $fh = *STDIN;
+  }
+
+  while ( my $line = <$fh> ) {
+    push( @todos, parseLine( $line ) );
+  }
+
+  close( $fh ) if defined( $filename );
+
+  return \@todos;
 }
 
 1;

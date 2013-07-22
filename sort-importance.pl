@@ -78,8 +78,7 @@ sub sortTodos {
   || TodoTxt::getDaysLeft( $b ) <=> TodoTxt::getDaysLeft( $a );
 }
 
-my $todos = TodoTxt::getTodos();
-
+my $todos = TodoTxt::readTodos( $ARGV[ 0 ] );
 foreach my $t ( sort sortTodos @$todos ) {
   print $t->{ 'src' };
 }

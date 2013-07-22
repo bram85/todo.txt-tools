@@ -34,7 +34,7 @@ use TodoTxt;
 #
 # * There is no due date
 
-my $todos = TodoTxt::getTodos();
+my $todos = TodoTxt::readTodos( $ARGV[ 0 ] );
 foreach my $todo ( @$todos ) {
   next if $todo->{ 'completed' };
   next if !TodoTxt::isActive( $todo );
