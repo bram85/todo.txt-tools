@@ -15,7 +15,7 @@ Priorities D till Z are treated equally, as far as these tools are concerned.
 What do these scripts do?
 -------------------------
 
-* *sort-importance.pl* sorts tasks by their importance, a derived metric as
+* **OUTDATED** *sort.pl* sorts tasks by their importance, a derived metric as
   found in the [Toodledo][2] task manager. It is defined as 2 + P + S + D
   where:
 

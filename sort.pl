@@ -18,10 +18,6 @@
 
 use Getopt::Std;
 use Time::Piece;
-
-my %options;
-getopts( 'w', \%options );
-
 use TodoTxt;
 
 my %priority = (
@@ -30,6 +26,15 @@ my %priority = (
   'C' => 1
 );
 
+my %option;
+getopts( "s:", \%option );
+
+my @sortOrder = ( 'priority' );
+@sortOrder = split( ",", $option{ 's' } ) if defined( $option{ 's' } );
+
+# default to sort by priority
+push( @sortOrder, 'desc:priority' ) unless scalar @sortOrder;
+
 sub getPriorityValue {
   $_[ 0 ] =~ /([A-C])/;
   return defined( $priority{ $1 } ) ? $priority{ $1 } : 0;
@@ -37,6 +42,8 @@ sub getPriorityValue {
 
 sub getImportance {
   my $todo = $_[ 0 ];
+  my $ignoreWeekends = $_[ 1 ];
+  $ignoreWeekends = 0 unless defined( $ignoreWeekends );
 
   my $importance = 2;
 
@@ -54,8 +61,6 @@ sub getImportance {
     $importance += 5 if ( $daysLeft >= 0 && $daysLeft < 1 );
     $importance += 6 if ( $daysLeft < 0 );
 
-    my $ignoreWeekends = defined( $options{ 'w' } );
-
     if ( $ignoreWeekends ) {
       # add compensation when the next working day is a Monday, add one to
       # importance
@@ -72,13 +77,55 @@ sub getImportance {
   return $importance;
 }
 
-sub sortTodos {
-  my $result = getImportance( $b ) <=> getImportance( $a )
-          || getPriorityValue( $b->{ 'priority' } ) <=> getPriorityValue( $a->{ 'priority' } )
-          || TodoTxt::getDaysLeft( $b ) <=> TodoTxt::getDaysLeft( $a );
+sub isDescending {
+  return $_[ 0 ] =~ /^desc:/;
+}
 
-  if ( !$result && defined( $a->{ 'createdOn' } ) && defined( $b->{ 'createdOn' } ) ) {
-    $result = $a->{ 'createdOn' } <=> $b->{ 'createdOn' };
+sub getSortItem {
+  ( my $sortItem = $_[ 0 ] ) =~ /^((asc|desc):)?([\w-]+)$/;
+  return $3;
+}
+
+sub sortOnOptionalField {
+  my ( $field, $a, $b ) = @_;
+  my $result = 0;
+
+  if ( defined( $a->{ $field } ) && defined( $b->{ $field } ) ) {
+    $result = $a->{ $field } cmp $b->{ $field };
+  }
+  elsif ( defined( $a->{ $field } ) ) {
+    $result = -1;
+  }
+  else {
+    $result = 1;
+  }
+
+  return $result;
+}
+
+sub swapSortResult {
+  return -1 if $_[ 0 ] == 1;
+  return 1 if $_[ 0 ] == -1;
+  return 0;
+}
+
+sub sortTodos {
+  my $result = 0;
+  foreach my $rawSortItem ( @sortOrder ) {
+    my $sortItem = getSortItem( $rawSortItem );
+
+    # no switch/given statement, I need to run this on ancient Perl.
+    $result = getImportance( $a, 0 ) <=> getImportance( $b, 0 )         if $sortItem eq 'importance';
+    $result = getImportance( $a, 1 ) <=> getImportance( $b, 1 )         if $sortItem eq 'importance-no-wknd';
+    $result = TodoTxt::getDaysLeft( $a ) <=> TodoTxt::getDaysLeft( $b ) if $sortItem eq 'due';
+    $result = sortOnOptionalField( "description" )                      if $sortItem eq 'description';
+    $result = sortOnOptionalField( "priority", $a, $b )                 if $sortItem eq 'priority';
+    $result = sortOnOptionalField( "createdOn", $a, $b )                if $sortItem eq 'creation';
+    $result = sortOnOptionalField( "start", $a, $b )                    if $sortItem eq 'start' || $sortItem eq 't';
+
+    $result = swapSortResult( $result ) if isDescending( $rawSortItem );
+
+    last if $result;
   }
 
   return $result;
