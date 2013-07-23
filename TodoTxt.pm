@@ -43,24 +43,24 @@ sub isDate {
 }
 
 sub isKeyValue {
-  return $_[ 0 ] =~ /^(\S+):(\S+)$/ ? ( $1, $2 ) : 0;
+  return $_[ 0 ] =~ /^([\w-]+):([\w-]+)\W*$/ ? ( $1, $2 ) : 0;
 }
 
 sub isContext {
-  return $_[ 0 ] =~ /^@\S+$/;
+  return $_[ 0 ] =~ /^@/;
 }
 
 sub getContext {
-  $_[ 0 ] =~ /^@(\w+)\W*$/;
+  $_[ 0 ] =~ /^@([\w-]+)\W*$/;
   return $1;
 }
 
 sub isProject {
-  return $_[ 0 ] =~ /^\+\S+$/;
+  return $_[ 0 ] =~ /^\+/;
 }
 
 sub getProject {
-  $_[ 0 ] =~ /^\+(\w+)\W*$/;
+  $_[ 0 ] =~ /^\+([\w-]+)\W*$/;
   return $1;
 }
 
