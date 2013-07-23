@@ -48,10 +48,10 @@ sub getImportance {
   if ( defined( $todo->{ 'tags' }->{ 'due' } ) ) {
     my $daysLeft = TodoTxt::getDaysLeft( $todo );
 
-    $importance += 1 if ( $daysLeft > 7 && $daysLeft <= 14 );
-    $importance += 2 if ( $daysLeft > 2 && $daysLeft <= 7 );
-    $importance += 3 if ( $daysLeft > 1 && $daysLeft <= 2 );
-    $importance += 5 if ( $daysLeft > 0 && $daysLeft <= 1 );
+    $importance += 1 if ( $daysLeft >= 7 && $daysLeft < 14 );
+    $importance += 2 if ( $daysLeft >= 2 && $daysLeft < 7 );
+    $importance += 3 if ( $daysLeft >= 1 && $daysLeft < 2 );
+    $importance += 5 if ( $daysLeft >= 0 && $daysLeft < 1 );
     $importance += 6 if ( $daysLeft < 0 );
 
     my $ignoreWeekends = defined( $options{ 'w' } );

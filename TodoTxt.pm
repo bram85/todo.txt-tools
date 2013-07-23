@@ -19,6 +19,7 @@
 package TodoTxt;
 
 use strict;
+use POSIX;
 use Time::Piece;
 use Time::Seconds;
 
@@ -115,7 +116,7 @@ sub getDaysDiff {
   my $now = localtime;
 
   my $diff = $due - $now;
-  return $diff->days;
+  return ceil( $diff->days );
 }
 
 sub getDaysLeft {
