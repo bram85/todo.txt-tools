@@ -68,7 +68,7 @@ Download / clone this repository and adjust your todo.cfg file to use these scri
 Of course, it's not required to use both, the scripts are independent. And it's
 also possible to run the scripts without the todo.txt CLI:
 
-    cat todo.txt | ./filter-relevance.pl
+    ./filter-relevance.pl /path/to/todo.txt
 
 [1]: https://github.com/ginatrapani/todo.txt-cli
 [2]: http://www.toodledo.com/info/help.php?sel=53
