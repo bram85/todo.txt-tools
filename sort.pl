@@ -109,6 +109,13 @@ sub swapSortResult {
   return 0;
 }
 
+sub sortOnPriority {
+  my ( $a, $b ) = @_;
+
+  # swap because priority value is inverse to charecter value
+  return swapSortResult( sortOnOptionalField( "priority", $a, $b ) );
+}
+
 sub sortTodos {
   my $result = 0;
   foreach my $rawSortItem ( @sortOrder ) {
@@ -119,7 +126,7 @@ sub sortTodos {
     $result = getImportance( $a, 1 ) <=> getImportance( $b, 1 )         if $sortItem eq 'importance-no-wknd';
     $result = TodoTxt::getDaysLeft( $a ) <=> TodoTxt::getDaysLeft( $b ) if $sortItem eq 'due';
     $result = sortOnOptionalField( "description" )                      if $sortItem eq 'description';
-    $result = sortOnOptionalField( "priority", $a, $b )                 if $sortItem eq 'priority';
+    $result = sortOnPriority( $a, $b )                                  if $sortItem eq 'priority';
     $result = sortOnOptionalField( "createdOn", $a, $b )                if $sortItem eq 'creation';
     $result = sortOnOptionalField( "start", $a, $b )                    if $sortItem eq 'start' || $sortItem eq 't';
 
