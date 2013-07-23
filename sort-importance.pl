@@ -73,9 +73,15 @@ sub getImportance {
 }
 
 sub sortTodos {
-  return getImportance( $b ) <=> getImportance( $a )
-  || getPriorityValue( $b->{ 'priority' } ) <=> getPriorityValue( $a->{ 'priority' } )
-  || TodoTxt::getDaysLeft( $b ) <=> TodoTxt::getDaysLeft( $a );
+  my $result = getImportance( $b ) <=> getImportance( $a )
+          || getPriorityValue( $b->{ 'priority' } ) <=> getPriorityValue( $a->{ 'priority' } )
+          || TodoTxt::getDaysLeft( $b ) <=> TodoTxt::getDaysLeft( $a );
+
+  if ( !$result && defined( $a->{ 'createdOn' } ) && defined( $b->{ 'createdOn' } ) ) {
+    $result = $a->{ 'createdOn' } <=> $b->{ 'createdOn' };
+  }
+
+  return $result;
 }
 
 my $todos = TodoTxt::readTodos( $ARGV[ 0 ] );
