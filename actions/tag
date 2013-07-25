@@ -94,13 +94,16 @@ if ( !defined( $key ) && !defined( $value ) ) {
 }
 elsif ( !$hasKey && defined( $value ) ) {
   addTag( $todo, $key, $value );
+  print $todo->{ 'src' };
 }
 elsif( defined( $todo->{ 'tags' }->{ $key } ) ) {
   if ( defined( $value ) ) {
     modifyTag( $todo, $key, $value );
+    print $todo->{ 'src' };
   }
   else {
     deleteTag( $todo, $key ) if $force || confirmDelete( $key );
+    print $todo->{ 'src' };
   }
 }
 else {
