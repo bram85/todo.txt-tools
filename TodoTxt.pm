@@ -143,7 +143,7 @@ sub hasTagValue {
   my ( $todo, $key, $value ) = @_;
 
   return hasTag( $todo, $key )
-      && grep { $_ eq $value } @{$todo->{ 'tags' }->{ 'key' }};
+      && grep { $_ eq $value } @{$todo->{ 'tags' }->{ $key }};
 }
 
 sub getTagValues {
@@ -166,6 +166,37 @@ sub isActive {
 sub hasPriority {
   my $todo = $_[ 0 ];
   return defined( $_[ 0 ]->{ 'priorityText' } );
+}
+
+sub addTag {
+  my ( $todo, $key, $value ) = @_;
+
+  return if hasTagValue( $todo, $key, $value );
+
+  $todo->{ 'src' } =~ s/$/ $key:$value/;
+  push( @{$todo->{ 'tags' }->{ $key }}, $value );
+}
+
+sub removeTag {
+  my ( $todo, $key, $value ) = @_;
+
+  if ( defined( $value ) ) {
+    $todo->{ 'src' } =~ s/\s?$key:$value\b//g;
+  }
+  else {
+    $todo->{ 'src' } =~ s/\s?$key:\S+\b//g;
+  }
+
+  my $values = $todo->{ 'tags' }->{ $key };
+  @$values = grep { $_ ne $value } @$values;
+  delete $todo->{ 'tags' }->{ $key } unless @$values;
+}
+
+sub modifyTag {
+  my ( $todo, $key, $value ) = @_;
+
+  $todo->{ 'src' } =~ s/\b$key:\S+\b/$key:$value/;
+  $todo->{ 'tags' }->{ $key } = $value;
 }
 
 sub parseLine {

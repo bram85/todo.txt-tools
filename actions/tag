@@ -37,13 +37,6 @@ sub listTags {
   }
 }
 
-sub addTag {
-  my ( $todo, $key, $value ) = @_;
-
-  $todo->{ 'src' } =~ s/$/ $key:$value/;
-  push( @{$todo->{ 'tags' }->{ $key }}, $value );
-}
-
 sub modifyTag {
   my ( $todo, $key, $value ) = @_;
 
@@ -52,16 +45,7 @@ sub modifyTag {
     exit 1;
   }
 
-  $todo->{ 'src' } =~ s/\b$key:\S+\b/$key:$value/;
-  $todo->{ 'tags' }->{ $key } = $value;
-}
-
-sub deleteTag {
-  my $todo = $_[ 0 ];
-  my $key = $_[ 1 ];
-
-  $todo->{ 'src' } =~ s/\s?$key:\S+\b//g;
-  delete $todo->{ 'tags' }->{ $key };
+  TodoTxt::modifyTag( $todo, $key, $value );
 }
 
 sub confirmDelete {
@@ -98,7 +82,7 @@ if ( !defined( $key ) && !defined( $value ) ) {
   exit 0;
 }
 elsif ( !$hasTag && defined( $value ) ) {
-  addTag( $todo, $key, $value );
+  TodoTxt::addTag( $todo, $key, $value );
   print $todo->{ 'src' };
 }
 elsif( defined( $todo->{ 'tags' }->{ $key } ) ) {
@@ -107,7 +91,7 @@ elsif( defined( $todo->{ 'tags' }->{ $key } ) ) {
     print $todo->{ 'src' };
   }
   else {
-    deleteTag( $todo, $key ) if $force || confirmDelete( $key );
+    TodoTxt::removeTag( $todo, $key ) if $force || confirmDelete( $key );
     print $todo->{ 'src' };
   }
 }
