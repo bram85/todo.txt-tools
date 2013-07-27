@@ -132,6 +132,27 @@ sub hasDueDate {
   return defined( $_[ 0 ]->{ 'due' } );
 }
 
+sub hasTag {
+  my ( $todo, $key ) = @_;
+
+  return defined( $todo->{ 'tags' } )
+      && defined( $todo->{ 'tags' }->{ $key } );
+}
+
+sub hasTagValue {
+  my ( $todo, $key, $value ) = @_;
+
+  return hasTag( $todo, $key )
+      && grep { $_ eq $value } @{$todo->{ 'tags' }->{ 'key' }};
+}
+
+sub getTagValues {
+  my ( $todo, $key ) = @_;
+
+  return 0 unless hasTag( $todo, $key );
+  return $todo->{ 'tags' }->{ $key };
+}
+
 sub isOverdue {
   my $todo = $_[ 0 ];
   return !hasDueDate( $todo ) || getDaysLeft( $todo ) < 0;
@@ -160,7 +181,7 @@ sub parseLine {
 
   while ( my $word = shift @words ) {
     my ( $key, $value ) = isKeyValue( $word );
-    $todo{ 'tags' }->{ $key } = $value if $key;
+    push( @{$todo{ 'tags' }->{ $key }}, $value ) if $key;
 
     my $startDate = isStartDate( $word );
     $todo{ 'start' } = $startDate if $startDate;

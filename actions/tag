@@ -30,10 +30,10 @@ sub listTags {
 
   foreach my $key ( sort keys %$tags ) {
     my $padding = "";
-    # $padding .= " " for ( $i = 0; $i < $maxLength - length( $key ); ++$i );
     $padding = " " x ( $maxLength - length( $key ) );
 
-    printf( "%s%s = %s\n", $key, $padding, $tags->{ $key } );
+    my $values = $tags->{ $key };
+    printf( "%s%s = %s\n", $key, $padding, $_ ) foreach @$values;
   }
 }
 
@@ -41,11 +41,16 @@ sub addTag {
   my ( $todo, $key, $value ) = @_;
 
   $todo->{ 'src' } =~ s/$/ $key:$value/;
-  $todo->{ 'tags' }->{ $key } = $value;
+  push( @{$todo->{ 'tags' }->{ $key }}, $value );
 }
 
 sub modifyTag {
   my ( $todo, $key, $value ) = @_;
+
+  if ( scalar @{$todo->{ 'tags' }->{ $key }} > 1 ) {
+    print STDERR "Cannot modify a tag which occurs multiple times in todo item.\n";
+    exit 1;
+  }
 
   $todo->{ 'src' } =~ s/\b$key:\S+\b/$key:$value/;
   $todo->{ 'tags' }->{ $key } = $value;
@@ -55,14 +60,14 @@ sub deleteTag {
   my $todo = $_[ 0 ];
   my $key = $_[ 1 ];
 
-  $todo->{ 'src' } =~ s/\s?$key:\S+\b//;
+  $todo->{ 'src' } =~ s/\s?$key:\S+\b//g;
   delete $todo->{ 'tags' }->{ $key };
 }
 
 sub confirmDelete {
   my $tag = $_[ 0 ];
 
-  print "Delete tag '$tag' [n]? ";
+  print "Delete all occurences of tag '$tag' in this item? [n] ";
   my $answer = <STDIN>;
   chomp $answer;
 
@@ -84,15 +89,15 @@ my $filename = $ENV{ 'TODO_DIR' } . "/todo.txt";
 TodoTxt::readTodos( $filename );
 
 my $todo = TodoTxt::getTodo( $taskNumber );
-my $hasKey = defined( $todo->{ 'tags' }->{ $key } );
-
 die "Item $taskNumber does not exist." unless $todo;
+
+my $hasTag = TodoTxt::hasTag( $todo, $key );
 
 if ( !defined( $key ) && !defined( $value ) ) {
   listTags( $todo );
   exit 0;
 }
-elsif ( !$hasKey && defined( $value ) ) {
+elsif ( !$hasTag && defined( $value ) ) {
   addTag( $todo, $key, $value );
   print $todo->{ 'src' };
 }

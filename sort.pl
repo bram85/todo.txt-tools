@@ -50,9 +50,9 @@ sub getImportance {
   $importance += getPriorityValue( $todo->{ 'priority' } );
 
   # auto-viv is not a problem here
-  $importance++ if $todo->{ 'tags' }->{ 'star' } == 1;
+  $importance++ if TodoTxt::hasTagValue( $todo, 'star', 1 );
 
-  if ( defined( $todo->{ 'tags' }->{ 'due' } ) ) {
+  if ( TodoTxt::hasTag( $todo, 'due' ) ) {
     my $daysLeft = TodoTxt::getDaysLeft( $todo );
 
     $importance += 1 if ( $daysLeft >= 7 && $daysLeft < 14 );
