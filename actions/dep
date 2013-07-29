@@ -1,0 +1,85 @@
+#!/usr/bin/perl -d
+
+# TodoTxt Tools
+# Copyright (C) 2013 Bram Schoenmakers <me@bramschoenmakers.nl>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+use strict;
+
+use lib '..';
+use Depends;
+use TodoTxt;
+
+my $filename = $ENV{ 'TODO_DIR' } . "/todo.txt";
+my $todos = TodoTxt::readTodos( $filename );
+
+sub usage {
+  print STDERR <<END;
+Usage: todo.sh dep add TASK# to TASK#
+       todo.sh dep rm  TASK# to TASK#
+       todo.sh dep ls  TASK# to
+       todo.sh dep ls        to TASK#
+
+Example:
+       todo.sh dep add 60 to 58
+       Adds a dependency from task 60 to task 58.
+
+       todo.sh dep ls to 58
+       Print all tasks depending on task 58.
+END
+
+  exit 1;
+}
+
+sub getTodo {
+  my $taskNr = $_[ 0 ];
+
+  my $todo = TodoTxt::getTodo( $taskNr );
+  die "Todo $taskNr does not exist." unless $todo;
+
+  return $todo;
+}
+
+my $subcommand = $ARGV[ 1 ];
+
+if ( $subcommand =~ /^(add|rm)$/ ) {
+  usage() if $ARGV[ 2 ] !~ /\d+/ && $ARGV[ 3 ] ne "to" && $ARGV[ 4 ] !~ /\d+/;
+
+  my $fromTask = getTodo( $ARGV[ 2 ] );
+  my $toTask = getTodo( $ARGV[ 4 ] );
+
+  Depends::addDependency( $fromTask, $toTask ) if $subcommand eq "add";
+  Depends::removeDependency( $fromTask, $toTask ) if $subcommand eq "rm";
+
+  TodoTxt::writeTodos( $filename );
+}
+elsif ( $subcommand eq "ls" ) {
+  if ( $ARGV[ 2 ] eq "to" && $ARGV[ 3 ] =~ /\d+/ ) {
+    # print all tasks referring to given task number
+    my $todo = getTodo( $ARGV[ 3 ] );
+    print $_->{ 'src' } foreach Depends::tasksReferringToId( getID( $todo ) );
+  }
+  elsif ( $ARGV[ 2 ] =~ /\d+/ && $ARGV[ 3 ] eq "to" ) {
+    # print all tasks the given task refers to
+    my $todo = getTodo( $ARGV[ 2 ] );
+    my @dependencies = Depends::getDependencies( $todo );
+    print $_->{ 'src' } foreach @dependencies;
+  }
+  else {
+    usage();
+  }
+} else {
+  usage();
+}

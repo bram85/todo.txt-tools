@@ -1,5 +1,21 @@
 #!/usr/bin/perl
 
+# TodoTxt Tools
+# Copyright (C) 2013 Bram Schoenmakers <me@bramschoenmakers.nl>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 use strict;
 
 use File::Spec;
@@ -30,39 +46,28 @@ sub listTags {
 
   foreach my $key ( sort keys %$tags ) {
     my $padding = "";
-    # $padding .= " " for ( $i = 0; $i < $maxLength - length( $key ); ++$i );
     $padding = " " x ( $maxLength - length( $key ) );
 
-    printf( "%s%s = %s\n", $key, $padding, $tags->{ $key } );
+    my $values = $tags->{ $key };
+    printf( "%s%s = %s\n", $key, $padding, $_ ) foreach @$values;
   }
-}
-
-sub addTag {
-  my ( $todo, $key, $value ) = @_;
-
-  $todo->{ 'src' } =~ s/$/ $key:$value/;
-  $todo->{ 'tags' }->{ $key } = $value;
 }
 
 sub modifyTag {
   my ( $todo, $key, $value ) = @_;
 
-  $todo->{ 'src' } =~ s/\b$key:\S+\b/$key:$value/;
-  $todo->{ 'tags' }->{ $key } = $value;
-}
+  if ( scalar @{$todo->{ 'tags' }->{ $key }} > 1 ) {
+    print STDERR "Cannot modify a tag which occurs multiple times in todo item.\n";
+    exit 1;
+  }
 
-sub deleteTag {
-  my $todo = $_[ 0 ];
-  my $key = $_[ 1 ];
-
-  $todo->{ 'src' } =~ s/\s?$key:\S+\b//;
-  delete $todo->{ 'tags' }->{ $key };
+  TodoTxt::modifyTag( $todo, $key, $value );
 }
 
 sub confirmDelete {
   my $tag = $_[ 0 ];
 
-  print "Delete tag '$tag' [n]? ";
+  print "Delete all occurences of tag '$tag' in this item? [n] ";
   my $answer = <STDIN>;
   chomp $answer;
 
@@ -84,16 +89,16 @@ my $filename = $ENV{ 'TODO_DIR' } . "/todo.txt";
 TodoTxt::readTodos( $filename );
 
 my $todo = TodoTxt::getTodo( $taskNumber );
-my $hasKey = defined( $todo->{ 'tags' }->{ $key } );
-
 die "Item $taskNumber does not exist." unless $todo;
+
+my $hasTag = TodoTxt::hasTag( $todo, $key );
 
 if ( !defined( $key ) && !defined( $value ) ) {
   listTags( $todo );
   exit 0;
 }
-elsif ( !$hasKey && defined( $value ) ) {
-  addTag( $todo, $key, $value );
+elsif ( !$hasTag && defined( $value ) ) {
+  TodoTxt::addTag( $todo, $key, $value );
   print $todo->{ 'src' };
 }
 elsif( defined( $todo->{ 'tags' }->{ $key } ) ) {
@@ -102,7 +107,7 @@ elsif( defined( $todo->{ 'tags' }->{ $key } ) ) {
     print $todo->{ 'src' };
   }
   else {
-    deleteTag( $todo, $key ) if $force || confirmDelete( $key );
+    TodoTxt::removeTag( $todo, $key ) if $force || confirmDelete( $key );
     print $todo->{ 'src' };
   }
 }

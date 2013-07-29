@@ -132,6 +132,27 @@ sub hasDueDate {
   return defined( $_[ 0 ]->{ 'due' } );
 }
 
+sub hasTag {
+  my ( $todo, $key ) = @_;
+
+  return defined( $todo->{ 'tags' } )
+      && defined( $todo->{ 'tags' }->{ $key } );
+}
+
+sub hasTagValue {
+  my ( $todo, $key, $value ) = @_;
+
+  return hasTag( $todo, $key )
+      && grep { $_ eq $value } @{$todo->{ 'tags' }->{ $key }};
+}
+
+sub getTagValues {
+  my ( $todo, $key ) = @_;
+
+  return 0 unless hasTag( $todo, $key );
+  return $todo->{ 'tags' }->{ $key };
+}
+
 sub isOverdue {
   my $todo = $_[ 0 ];
   return !hasDueDate( $todo ) || getDaysLeft( $todo ) < 0;
@@ -147,6 +168,37 @@ sub hasPriority {
   return defined( $_[ 0 ]->{ 'priorityText' } );
 }
 
+sub addTag {
+  my ( $todo, $key, $value ) = @_;
+
+  return if hasTagValue( $todo, $key, $value );
+
+  $todo->{ 'src' } =~ s/$/ $key:$value/;
+  push( @{$todo->{ 'tags' }->{ $key }}, $value );
+}
+
+sub removeTag {
+  my ( $todo, $key, $value ) = @_;
+
+  if ( defined( $value ) ) {
+    $todo->{ 'src' } =~ s/\s?$key:$value\b//g;
+  }
+  else {
+    $todo->{ 'src' } =~ s/\s?$key:\S+\b//g;
+  }
+
+  my $values = $todo->{ 'tags' }->{ $key };
+  @$values = grep { $_ ne $value } @$values;
+  delete $todo->{ 'tags' }->{ $key } unless @$values;
+}
+
+sub modifyTag {
+  my ( $todo, $key, $value ) = @_;
+
+  $todo->{ 'src' } =~ s/\b$key:\S+\b/$key:$value/;
+  $todo->{ 'tags' }->{ $key } = $value;
+}
+
 sub parseLine {
   my $line = $_[ 0 ];
 
@@ -160,7 +212,7 @@ sub parseLine {
 
   while ( my $word = shift @words ) {
     my ( $key, $value ) = isKeyValue( $word );
-    $todo{ 'tags' }->{ $key } = $value if $key;
+    push( @{$todo{ 'tags' }->{ $key }}, $value ) if $key;
 
     my $startDate = isStartDate( $word );
     $todo{ 'start' } = $startDate if $startDate;
@@ -186,6 +238,10 @@ sub parseLine {
   }
 
   return \%todo;
+}
+
+sub getTodos {
+  return \@todos;
 }
 
 sub readTodos {
