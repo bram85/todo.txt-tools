@@ -240,6 +240,10 @@ sub parseLine {
   return \%todo;
 }
 
+sub getTodos {
+  return \@todos;
+}
+
 sub readTodos {
   my $filename = $_[ 0 ];
 
