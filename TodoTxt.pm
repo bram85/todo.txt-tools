@@ -139,7 +139,7 @@ sub isOverdue {
 
 sub isActive {
   my $todo = $_[ 0 ];
-  return !hasStartDate( $todo ) || getDaysDiff( $todo->{ 'start' } ) < 0;
+  return !hasStartDate( $todo ) || getDaysDiff( $todo->{ 'start' } ) <= 0;
 }
 
 sub hasPriority {
