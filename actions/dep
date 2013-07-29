@@ -19,6 +19,7 @@
 use strict;
 
 use lib '..';
+use Depends;
 use TodoTxt;
 
 my $filename = $ENV{ 'TODO_DIR' } . "/todo.txt";
@@ -42,50 +43,6 @@ END
   exit 1;
 }
 
-sub taskExistsHavingId {
-  my $id = $_[ 0 ];
-  my @result = grep { $_->{ 'tags' }->{ 'id' }->[ 0 ] == $id } @$todos;
-
-  return 0 unless @result;
-
-  # there is only one such task, return first one
-  return $result[ 0 ];
-}
-
-sub getNewID {
-  my $i = 1;
-  while ( taskExistsHavingId( $i ) ) {
-    $i++;
-  }
-
-  return $i;
-}
-
-sub getID {
-  my $todo = $_[ 0 ];
-  my $values = TodoTxt::getTagValues( $todo, "id" );
-
-  return 0 unless $values;
-  return $values->[ 0 ];
-}
-
-sub assignID {
-  my $todo = $_[ 0 ];
-
-  my $id = getNewID();
-  TodoTxt::addTag( $todo, 'id', $id );
-  return $id;
-}
-
-sub tasksReferringToId {
-  my $id = $_[ 0 ];
-
-  return grep {
-    my $deps = $_->{ 'tags' }->{ 'dep' };
-    grep { $_ eq $id } @$deps;
-  } @$todos;
-}
-
 sub getTodo {
   my $taskNr = $_[ 0 ];
 
@@ -93,23 +50,6 @@ sub getTodo {
   die "Todo $taskNr does not exist." unless $todo;
 
   return $todo;
-}
-
-sub addDependency {
-  my ( $fromTask, $toTask ) = @_;
-
-  my $toId = getID( $toTask ) || assignID( $toTask );
-
-  TodoTxt::addTag( $fromTask, "dep", $toId );
-}
-
-sub removeDependency {
-  my ( $fromTask, $toTask ) = @_;
-
-  my $toId = getID( $toTask );
-  TodoTxt::removeTag( $fromTask, 'dep', $toId );
-
-  TodoTxt::removeTag( $toTask, 'id' ) unless tasksReferringToId( $toId );
 }
 
 my $subcommand = $ARGV[ 1 ];
@@ -120,8 +60,8 @@ if ( $subcommand =~ /^(add|rm)$/ ) {
   my $fromTask = getTodo( $ARGV[ 2 ] );
   my $toTask = getTodo( $ARGV[ 4 ] );
 
-  addDependency( $fromTask, $toTask ) if $subcommand eq "add";
-  removeDependency( $fromTask, $toTask ) if $subcommand eq "rm";
+  Depends::addDependency( $fromTask, $toTask ) if $subcommand eq "add";
+  Depends::removeDependency( $fromTask, $toTask ) if $subcommand eq "rm";
 
   TodoTxt::writeTodos( $filename );
 }
@@ -129,16 +69,13 @@ elsif ( $subcommand eq "ls" ) {
   if ( $ARGV[ 2 ] eq "to" && $ARGV[ 3 ] =~ /\d+/ ) {
     # print all tasks referring to given task number
     my $todo = getTodo( $ARGV[ 3 ] );
-    print $_->{ 'src' } foreach tasksReferringToId( getID( $todo ) );
+    print $_->{ 'src' } foreach Depends::tasksReferringToId( getID( $todo ) );
   }
   elsif ( $ARGV[ 2 ] =~ /\d+/ && $ARGV[ 3 ] eq "to" ) {
     # print all tasks the given task refers to
     my $todo = getTodo( $ARGV[ 2 ] );
-
-    foreach my $dep ( @{$todo->{ 'tags' }->{ 'dep' }} ) {
-      my $endPoint = taskExistsHavingId( $dep );
-      print $endPoint->{ 'src' } if $endPoint;
-    }
+    my @dependencies = Depends::getDependencies( $todo );
+    print $_->{ 'src' } foreach @dependencies;
   }
   else {
     usage();
