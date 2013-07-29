@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -d
 
 # TodoTxt Tools
 # Copyright (C) 2013 Bram Schoenmakers <me@bramschoenmakers.nl>
@@ -21,18 +21,36 @@ use strict;
 use Depends;
 use TodoTxt;
 
+sub getDependencies {
+  my $todo = $_[ 0 ];
+  return grep { $_ != 0 } map { TodoTxt::taskExistsHavingId( $_ ) } @{ $todo->{ 'tags' }->{ 'dep' } }
+}
+
 sub inCycle {
+  my $root = $_[ 0 ];
+
+  my %visited;
+  $visited{ $root->{ 'src' } } = 1;
+
+  my @queue = getDependencies( $root );
+  while ( @queue ) {
+    my $todo = shift @queue;
+
+    return 1 if $todo->{ 'src' } eq $root->{ 'src' };
+    next if defined( $visited{ $todo->{ 'src' } } );
+
+    $visited{ $todo->{ 'src' } } = 1;
+
+    @queue = ( @queue, getDependencies( $todo ) );
+  }
+
   return 0;
 }
 
 sub hasUnfinishedDependencies {
   my $todo = $_[ 0 ];
 
-  # check if this todo can be referred to at all
-  return 0 unless defined( $todo->{ 'tags' }->{ 'id' } );
-
-  my @dependencies = TodoTxt::tasksReferringToId( $todo->{ 'tags' }->{ 'id' }->[ 0 ] );
-  return grep { !defined( $_->{ 'completed' } ) || $_->{ 'completed' } == 0 } @dependencies;
+  return grep { !defined( $_->{ 'completed' } ) || $_->{ 'completed' } == 0 } getDependencies( $todo );
 }
 
 # print if todo:
