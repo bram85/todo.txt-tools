@@ -84,11 +84,7 @@ sub removeDependency {
 
 sub getDependencies {
   my $todo = $_[ 0 ];
-  my $id = getNewID( $todo );
-
-  return () unless $id;
-
-  return map { taskExistsHavingId( $id ) } @{$todo->{ 'tags' }->{ 'dep' }}
+  return map { taskExistsHavingId( $_ ) } @{$todo->{ 'tags' }->{ 'dep' }}
 }
 
 1;
