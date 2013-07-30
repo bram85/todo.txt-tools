@@ -1,4 +1,4 @@
-#!/usr/bin/perl -d
+#!/usr/bin/perl
 
 # TodoTxt Tools
 # Copyright (C) 2013 Bram Schoenmakers <me@bramschoenmakers.nl>
@@ -60,8 +60,8 @@ if ( $subcommand =~ /^(add|rm)$/ ) {
   my $fromTask = getTodo( $ARGV[ 2 ] );
   my $toTask = getTodo( $ARGV[ 4 ] );
 
-  Depends::addDependency( $fromTask, $toTask ) if $subcommand eq "add";
-  Depends::removeDependency( $fromTask, $toTask ) if $subcommand eq "rm";
+  TodoTxt::addDependency( $fromTask, $toTask ) if $subcommand eq "add";
+  TodoTxt::removeDependency( $fromTask, $toTask ) if $subcommand eq "rm";
 
   TodoTxt::writeTodos( $filename );
 }
@@ -69,12 +69,12 @@ elsif ( $subcommand eq "ls" ) {
   if ( $ARGV[ 2 ] eq "to" && $ARGV[ 3 ] =~ /\d+/ ) {
     # print all tasks referring to given task number
     my $todo = getTodo( $ARGV[ 3 ] );
-    print $_->{ 'src' } foreach Depends::tasksReferringToId( getID( $todo ) );
+    print $_->{ 'src' } foreach TodoTxt::tasksReferringToId( getID( $todo ) );
   }
   elsif ( $ARGV[ 2 ] =~ /\d+/ && $ARGV[ 3 ] eq "to" ) {
     # print all tasks the given task refers to
     my $todo = getTodo( $ARGV[ 2 ] );
-    my @dependencies = Depends::getDependencies( $todo );
+    my @dependencies = TodoTxt::getDependencies( $todo );
     print $_->{ 'src' } foreach @dependencies;
   }
   else {
