@@ -22,7 +22,7 @@ sub getTaskByID {
   my $id = $_[ 0 ];
 
   my $todos = TodoTxt::getTodos();
-  my @result = grep { $_->{ 'tags' }->{ 'id' }->[ 0 ] == $id } @$todos;
+  my @result = grep { TodoTxt::getTagValue( $_, 'id' ) } @$todos;
 
   # there is only one such task, return first one
   return @result ? $result[ 0 ] : 0;
@@ -54,12 +54,12 @@ sub assignID {
 
 sub getDependencies {
   my $todo = $_[ 0 ];
-  my $id = $todo->{ 'tags' }->{ 'id' }->[ 0 ];
+  my $id = TodoTxt::getTagValue( $todo, 'id' );
 
   return () unless defined( $id );
 
   my $todos = TodoTxt::getTodos();
-  return grep { grep { $_ eq $id } @{$_->{ 'tags' }->{ 'p' } } } @$todos;
+  return grep { TodoTxt::hasTagValue( $_, 'p', $id ) } @$todos;
 }
 
 sub addDependency {

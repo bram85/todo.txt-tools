@@ -56,7 +56,8 @@ sub listTags {
 sub modifyTag {
   my ( $todo, $key, $value ) = @_;
 
-  if ( scalar @{$todo->{ 'tags' }->{ $key }} > 1 ) {
+  my @currentValues = TodoTxt::getTagValues( $todo, $key );
+  if ( @currentValues > 1 ) {
     print STDERR "Cannot modify a tag which occurs multiple times in todo item.\n";
     exit 1;
   }
@@ -101,7 +102,7 @@ elsif ( !$hasTag && defined( $value ) ) {
   TodoTxt::addTag( $todo, $key, $value );
   print $todo->{ 'src' };
 }
-elsif( defined( $todo->{ 'tags' }->{ $key } ) ) {
+elsif( TodoTxt::hasTag( $todo, $key ) ) {
   if ( defined( $value ) ) {
     modifyTag( $todo, $key, $value );
     print $todo->{ 'src' };

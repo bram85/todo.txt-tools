@@ -146,11 +146,18 @@ sub hasTagValue {
       && grep { $_ eq $value } @{$todo->{ 'tags' }->{ $key }};
 }
 
+sub getTagValue {
+  my ( $todo, $key ) = @_;
+
+  my @values = getTagValues( $todo, $key );
+  return @values ? $values[ 0 ] : 0;
+}
+
 sub getTagValues {
   my ( $todo, $key ) = @_;
 
-  return 0 unless hasTag( $todo, $key );
-  return $todo->{ 'tags' }->{ $key };
+  return () unless hasTag( $todo, $key );
+  return @{$todo->{ 'tags' }->{ $key }};
 }
 
 sub isOverdue {
