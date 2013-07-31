@@ -53,13 +53,37 @@ sub assignID {
 }
 
 sub getDependencies {
-  my $todo = $_[ 0 ];
-  my $id = TodoTxt::getTagValue( $todo, 'id' );
+  my $root = $_[ 0 ];
+  my $recursive = defined( $_[ 1 ] ) ? $_[ 1 ] : 1;
 
-  return () unless defined( $id );
+  my %result = ();
+  my @queue = ( $root );
 
   my $todos = TodoTxt::getTodos();
-  return grep { TodoTxt::hasTagValue( $_, 'p', $id ) } @$todos;
+
+  while ( @queue ) {
+    my $todo = shift @queue;
+    my $id = TodoTxt::getTagValue( $todo, 'id' );
+
+    next unless $id;
+
+    my @newDeps = grep { TodoTxt::hasTagValue( $_, 'p', $id ) } @$todos;
+
+    foreach my $newDep ( @newDeps ) {
+      unless ( exists( $result{ $newDep->{ 'src' } } ) ) {
+        $result{ $newDep->{ 'src' } } = $newDep;
+        push( @queue, $newDep );
+      }
+    }
+
+    last unless $recursive;
+  }
+
+  return values %result;
+}
+
+sub getDirectDependencies {
+  return getDependencies( $_[ 0 ], 0 );
 }
 
 sub addDependency {
