@@ -24,10 +24,8 @@ sub getTaskByID {
   my $todos = TodoTxt::getTodos();
   my @result = grep { $_->{ 'tags' }->{ 'id' }->[ 0 ] == $id } @$todos;
 
-  return 0 unless @result;
-
   # there is only one such task, return first one
-  return $result[ 0 ];
+  return @result ? $result[ 0 ] : 0;
 }
 
 sub getNewID {
@@ -43,8 +41,7 @@ sub getID {
   my $todo = $_[ 0 ];
   my $values = TodoTxt::getTagValues( $todo, "id" );
 
-  return 0 unless $values;
-  return $values->[ 0 ];
+  return $values ? $values->[ 0 ] : 0;
 }
 
 sub assignID {
@@ -55,36 +52,31 @@ sub assignID {
   return $id;
 }
 
-sub tasksReferringToId {
-  my $id = $_[ 0 ];
+sub getDependencies {
+  my $todo = $_[ 0 ];
+  my $id = $todo->{ 'tags' }->{ 'id' }->[ 0 ];
+
+  return () unless defined( $id );
 
   my $todos = TodoTxt::getTodos();
-  return grep {
-    my $deps = $_->{ 'tags' }->{ 'dep' };
-    grep { $_ eq $id } @$deps;
-  } @$todos;
+  return grep { grep { $_ eq $id } @{$_->{ 'tags' }->{ 'p' } } } @$todos;
 }
 
 sub addDependency {
   my ( $fromTask, $toTask ) = @_;
 
-  my $toId = getID( $toTask ) || assignID( $toTask );
+  my $fromId = getID( $fromTask ) || assignID( $fromTask );
 
-  TodoTxt::addTag( $fromTask, "dep", $toId );
+  TodoTxt::addTag( $toTask, "p", $fromId );
 }
 
 sub removeDependency {
   my ( $fromTask, $toTask ) = @_;
 
-  my $toId = getID( $toTask );
-  TodoTxt::removeTag( $fromTask, 'dep', $toId );
+  my $fromId = getID( $fromTask );
+  TodoTxt::removeTag( $toTask, 'p', $fromId );
 
-  TodoTxt::removeTag( $toTask, 'id' ) unless tasksReferringToId( $toId );
-}
-
-sub getDependencies {
-  my $todo = $_[ 0 ];
-  return map { getTaskByID( $_ ) } @{$todo->{ 'tags' }->{ 'dep' }}
+  TodoTxt::removeTag( $fromTask, 'id' ) unless getDependencies( $fromTask );
 }
 
 1;

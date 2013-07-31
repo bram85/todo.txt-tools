@@ -69,7 +69,7 @@ elsif ( $subcommand eq "ls" ) {
   if ( $ARGV[ 2 ] eq "to" && $ARGV[ 3 ] =~ /\d+/ ) {
     # print all tasks referring to given task number
     my $todo = getTodo( $ARGV[ 3 ] );
-    print $_->{ 'src' } foreach TodoTxt::tasksReferringToId( getID( $todo ) );
+    print $_->{ 'src' } foreach map { TodoTxt::getTaskByID( $_ ) } @{$todo->{ 'tags' }->{ 'p' }};
   }
   elsif ( $ARGV[ 2 ] =~ /\d+/ && $ARGV[ 3 ] eq "to" ) {
     # print all tasks the given task refers to

@@ -21,18 +21,13 @@ use strict;
 use Depends;
 use TodoTxt;
 
-sub getDependencies {
-  my $todo = $_[ 0 ];
-  return grep { $_ != 0 } map { TodoTxt::taskExistsHavingId( $_ ) } @{ $todo->{ 'tags' }->{ 'dep' } }
-}
-
 sub inCycle {
   my $root = $_[ 0 ];
 
   my %visited;
   $visited{ $root->{ 'src' } } = 1;
 
-  my @queue = getDependencies( $root );
+  my @queue = TodoTxt::getDependencies( $root );
   while ( @queue ) {
     my $todo = shift @queue;
 
@@ -41,7 +36,7 @@ sub inCycle {
 
     $visited{ $todo->{ 'src' } } = 1;
 
-    @queue = ( @queue, getDependencies( $todo ) );
+    @queue = ( @queue, TodoTxt::getDependencies( $todo ) );
   }
 
   return 0;
