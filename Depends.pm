@@ -18,7 +18,7 @@ package TodoTxt;
 
 use TodoTxt;
 
-sub taskExistsHavingId {
+sub getTaskByID {
   my $id = $_[ 0 ];
 
   my $todos = TodoTxt::getTodos();
@@ -32,7 +32,7 @@ sub taskExistsHavingId {
 
 sub getNewID {
   my $i = 1;
-  while ( taskExistsHavingId( $i ) ) {
+  while ( getTaskByID( $i ) ) {
     $i++;
   }
 
@@ -84,7 +84,7 @@ sub removeDependency {
 
 sub getDependencies {
   my $todo = $_[ 0 ];
-  return map { taskExistsHavingId( $_ ) } @{$todo->{ 'tags' }->{ 'dep' }}
+  return map { getTaskByID( $_ ) } @{$todo->{ 'tags' }->{ 'dep' }}
 }
 
 1;
