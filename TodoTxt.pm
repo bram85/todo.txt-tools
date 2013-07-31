@@ -254,8 +254,12 @@ sub readTodos {
     $fh = *STDIN;
   }
 
+  my $i = 1;
   while ( my $line = <$fh> ) {
-    push( @todos, parseLine( $line ) );
+    my $todo = parseLine( $line );
+    $todo->{ 'num' } = $i++;
+
+    push( @todos, $todo );
   }
 
   close( $fh ) if defined( $filename );

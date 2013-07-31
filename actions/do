@@ -1,0 +1,39 @@
+#!/usr/bin/perl
+
+use lib '..';
+use TodoTxt;
+use Depends;
+
+sub usage {
+  print STDERR "Usage: todo.sh do TASK#[,TASK#,...]\n";
+  exit 1;
+}
+
+sub confirmDepsDone {
+  print "Also mark subtasks as done? [n] " ;
+  my $answer = <STDIN>;
+
+  return $answer =~ /^y(es)?$/i;
+}
+
+usage() unless $ARGV[ 1 ] =~ /^\d(,\d)*$/;
+
+my $force = $ENV{ 'TODOTXT_FORCE' };
+
+my $filename = $ENV{ 'TODO_DIR' } . "/todo.txt";
+TodoTxt::readTodos( $filename );
+
+my @done = split( ',', $ARGV[ 1 ] );
+my %done = map { $_ => 1 } @done;
+
+my @todos = map { TodoTxt::getTodo( $_ ) } @done;
+
+my $subTaskExists = grep { TodoTxt::hasTag( $_, 'id' ) } @todos;
+
+if ( $subTaskExists && !$force && confirmDepsDone() ) {
+  map { $done{ $_->{ 'num' } } = 1 } TodoTxt::getDependencies( $_ ) foreach @todos;
+}
+
+# execute the 'super' do
+my $command = sprintf( "%s command do %s", $ENV{ 'TODO_FULL_SH' }, join( ',', keys %done ) );
+`$command`;
