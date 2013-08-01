@@ -100,7 +100,7 @@ sub removeDependency {
   my $fromId = getID( $fromTask );
   TodoTxt::removeTag( $toTask, 'p', $fromId );
 
-  TodoTxt::removeTag( $fromTask, 'id' ) unless getDependencies( $fromTask );
+  TodoTxt::removeTag( $fromTask, 'id' ) unless getDirectDependencies( $fromTask );
 }
 
 1;
