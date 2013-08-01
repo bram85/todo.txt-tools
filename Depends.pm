@@ -37,13 +37,6 @@ sub getNewID {
   return $i;
 }
 
-sub getID {
-  my $todo = $_[ 0 ];
-  my $values = TodoTxt::getTagValues( $todo, "id" );
-
-  return $values ? $values->[ 0 ] : 0;
-}
-
 sub assignID {
   my $todo = $_[ 0 ];
 
@@ -65,7 +58,7 @@ sub getDependencies {
 sub addDependency {
   my ( $fromTask, $toTask ) = @_;
 
-  my $fromId = getID( $fromTask ) || assignID( $fromTask );
+  my $fromId = TodoTxt::getTagValue( $fromTask, "id" ) || assignID( $fromTask );
 
   TodoTxt::addTag( $toTask, "p", $fromId );
 }
@@ -73,7 +66,7 @@ sub addDependency {
 sub removeDependency {
   my ( $fromTask, $toTask ) = @_;
 
-  my $fromId = getID( $fromTask );
+  my $fromId = TodoTxt::getTagValue( $fromTask, "id" );
   TodoTxt::removeTag( $toTask, 'p', $fromId );
 
   TodoTxt::removeTag( $fromTask, 'id' ) unless getDependencies( $fromTask );
