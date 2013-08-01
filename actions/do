@@ -16,7 +16,7 @@ sub confirmDepsDone {
   return $answer =~ /^y(es)?$/i;
 }
 
-usage() unless $ARGV[ 1 ] =~ /^\d(,\d)*$/;
+usage() unless $ARGV[ 1 ] =~ /^\d+(,\d+)*$/;
 
 my $force = $ENV{ 'TODOTXT_FORCE' };
 
