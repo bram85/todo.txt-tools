@@ -45,7 +45,7 @@ sub inCycle {
 sub hasUnfinishedDependencies {
   my $todo = $_[ 0 ];
 
-  return grep { !defined( $_->{ 'completed' } ) || $_->{ 'completed' } == 0 } getDependencies( $todo );
+  return grep { !defined( $_->{ 'completed' } ) || $_->{ 'completed' } == 0 } TodoTxt::getDependencies( $todo );
 }
 
 # print if todo:
