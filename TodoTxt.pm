@@ -74,6 +74,11 @@ sub isStartDate {
   return $key eq 't' && isDate( $value ) ? $value : 0;
 }
 
+sub isCompleted {
+  my $todo = $_[ 0 ];
+  return defined( $todo->{ 'completed' } ) && $todo->{ 'completed' } == 1;
+}
+
 # deals with completeness, priorities and dates at the start of a line
 sub getFirstData {
   my ( $todo, $words ) = @_;
