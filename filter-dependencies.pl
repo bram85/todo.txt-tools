@@ -23,8 +23,7 @@ use TodoTxt;
 
 sub hasUnfinishedDependencies {
   my $todo = $_[ 0 ];
-
-  return grep { !defined( $_->{ 'completed' } ) || $_->{ 'completed' } == 0 } TodoTxt::getDirectDependencies( $todo );
+  return grep { !TodoTxt::isCompleted( $_ ) } TodoTxt::getDirectDependencies( $todo );
 }
 
 my $todos = TodoTxt::readTodos( $ARGV[ 0 ] );
