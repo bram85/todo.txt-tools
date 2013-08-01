@@ -22,7 +22,7 @@ sub getTaskByID {
   my $id = $_[ 0 ];
 
   my $todos = TodoTxt::getTodos();
-  my @result = grep { TodoTxt::getTagValue( $_, 'id' ) } @$todos;
+  my @result = grep { TodoTxt::getTagValue( $_, 'id' ) eq $id } @$todos;
 
   # there is only one such task, return first one
   return @result ? $result[ 0 ] : 0;
