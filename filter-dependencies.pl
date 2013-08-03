@@ -21,9 +21,17 @@ use strict;
 use Depends;
 use TodoTxt;
 
+sub pathExists {
+  my ( $from, $to ) = @_;
+  return grep { $_->{ 'src' } eq $to->{ 'src' } } TodoTxt::getDependencies( $from );
+}
+
 sub hasUnfinishedDependencies {
   my $todo = $_[ 0 ];
-  return grep { !TodoTxt::isCompleted( $_ ) } TodoTxt::getDirectDependencies( $todo );
+  return grep {
+    !TodoTxt::isCompleted( $_ )
+    && !pathExists( $_, $todo )
+  } TodoTxt::getDependencies( $todo );
 }
 
 my $todos = TodoTxt::readTodos( $ARGV[ 0 ] );
