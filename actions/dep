@@ -52,6 +52,21 @@ sub getTodo {
   return $todo;
 }
 
+sub cleanIds {
+  # clean id's which are no longer referred to
+  foreach my $todo ( @$todos ) {
+    TodoTxt::removeTag( $todo, 'id' ) unless TodoTxt::getDirectDependencies( $todo );
+  }
+
+  # clean references whose end point does not exist anymore
+  foreach my $todo ( @$todos ) {
+    my @parents = TodoTxt::getTagValues( $todo, 'p' );
+    foreach my $parent ( @parents ) {
+      TodoTxt::removeTag( $todo, 'p', $parent ) unless TodoTxt::getTaskByID( $parent );
+    }
+  }
+}
+
 my $subcommand = $ARGV[ 1 ];
 
 if ( $subcommand =~ /^(add|rm)$/ ) {
@@ -81,6 +96,9 @@ elsif ( $subcommand eq "ls" ) {
   else {
     usage();
   }
+} elsif ( $subcommand =~ /^(clean|gc)$/ ) {
+  cleanIds();
+  TodoTxt::writeTodos( $filename );
 } else {
   usage();
 }
