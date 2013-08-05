@@ -36,4 +36,4 @@ if ( $subTaskExists && !$force && confirmDepsDone() ) {
 
 # execute the 'super' do
 my $command = sprintf( "%s command do %s", $ENV{ 'TODO_FULL_SH' }, join( ',', keys %done ) );
-`$command`;
+print `$command`;
