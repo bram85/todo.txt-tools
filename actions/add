@@ -1,0 +1,18 @@
+#!/usr/bin/perl
+
+use Time::Piece;
+
+my $text = $ARGV[ 1 ];
+
+$text =~ /^(\([A-Z]\) )?(\d{4}-\d{2}-\d{2} )?(.*)$/;
+my ( $priority, $creation, $remainder ) = ( $1, $2, $3 );
+
+unless ( defined( $creation ) ) {
+  my $now = localtime();
+  my $date = $now->ymd;
+
+  $text = sprintf( "%s%s %s", $priority, $date, $remainder );
+}
+
+my $command = sprintf( "%s command add '%s'", $ENV{ 'TODO_FULL_SH' }, $text );
+print `$command`;
