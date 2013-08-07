@@ -1,5 +1,3 @@
-#!/usr/bin/perl
-
 # TodoTxt Tools
 # Copyright (C) 2013 Bram Schoenmakers <me@bramschoenmakers.nl>
 
