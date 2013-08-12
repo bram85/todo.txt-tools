@@ -32,6 +32,13 @@ sub parseDate {
   return Time::Piece->strptime( $_[ 0 ], "%Y-%m-%d" );
 }
 
+sub getDateDifference {
+  my ( $date1, $date2 ) = @_;
+
+  my $diff = $date2 - $date1;
+  return ceil( $diff->days );
+}
+
 sub isPriority {
   return $_[ 0 ] =~ /^\([A-Z]\)$/;
 }
@@ -114,17 +121,16 @@ sub getFirstData {
   }
 }
 
-sub getDaysDiff {
-  my $due = parseDate( $_[ 0 ] );
-  my $now = localtime;
+sub getDaysUntil {
+  my $date = parseDate( $_[ 0 ] );
+  my $now = localtime();
 
-  my $diff = $due - $now;
-  return ceil( $diff->days );
+  return getDateDifference( $now, $date );
 }
 
 sub getDaysLeft {
   my $todo = $_[ 0 ];
-  return getDaysDiff( $todo->{ 'due' } );
+  return getDaysUntil( $todo->{ 'due' } );
 }
 
 sub hasStartDate {
@@ -170,7 +176,7 @@ sub isOverdue {
 
 sub isActive {
   my $todo = $_[ 0 ];
-  return !hasStartDate( $todo ) || getDaysDiff( $todo->{ 'start' } ) <= 0;
+  return !hasStartDate( $todo ) || getDaysUntil( $todo->{ 'start' } ) <= 0;
 }
 
 sub hasPriority {
