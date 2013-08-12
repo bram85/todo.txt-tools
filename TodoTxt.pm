@@ -140,6 +140,7 @@ sub hasStartDate {
 sub setStartDate {
   my ( $todo, $start ) = @_;
 
+  $todo->{ 'start' } = $start;
   setTag( $todo, 'start', $start ) if hasTag( $todo, 'start' );
   setTag( $todo, 't', $start ) if hasTag( $todo, 't' );
 }
@@ -150,6 +151,7 @@ sub hasDueDate {
 
 sub setDueDate {
   my ( $todo, $due ) = @_;
+  $todo->{ 'due' } = $due;
   setTag( $todo, 'due', $due );
 }
 
