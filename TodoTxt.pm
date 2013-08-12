@@ -137,8 +137,20 @@ sub hasStartDate {
   return defined( $_[ 0 ]->{ 'start' } );
 }
 
+sub setStartDate {
+  my ( $todo, $start ) = @_;
+
+  setTag( $todo, 'start', $start ) if hasTag( $todo, 'start' );
+  setTag( $todo, 't', $start ) if hasTag( $todo, 't' );
+}
+
 sub hasDueDate {
   return defined( $_[ 0 ]->{ 'due' } );
+}
+
+sub setDueDate {
+  my ( $todo, $due ) = @_;
+  setTag( $todo, 'due', $due );
 }
 
 sub hasTag {
