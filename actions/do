@@ -19,6 +19,7 @@
 use lib '..';
 use TodoTxt;
 use Depends;
+use Recurrence;
 
 sub usage {
   print STDERR "Usage: todo.sh do TASK#[,TASK#,...]\n";
@@ -30,6 +31,13 @@ sub confirmDepsDone {
   my $answer = <STDIN>;
 
   return $answer =~ /^y(es)?$/i;
+}
+
+sub executeTodoSh {
+  my $command = $_[ 0 ];
+
+  my $fullCommand = sprintf( "%s command %s", $ENV{ 'TODO_FULL_SH' }, $command );
+  print `$fullCommand`;
 }
 
 usage() unless $ARGV[ 1 ] =~ /^\d+(,\d+)*$/;
@@ -44,12 +52,30 @@ my %done = map { $_ => 1 } @done;
 
 my @todos = map { TodoTxt::getTodo( $_ ) } @done;
 
+################
+# Dependencies #
+################
+
 my $subTaskExists = grep { TodoTxt::hasTag( $_, 'id' ) } @todos;
 
 if ( $subTaskExists && !$force && confirmDepsDone() ) {
   map { $done{ $_->{ 'num' } } = 1 } TodoTxt::getDependencies( $_ ) foreach @todos;
 }
 
-# execute the 'super' do
-my $command = sprintf( "%s command do %s", $ENV{ 'TODO_FULL_SH' }, join( ',', keys %done ) );
-print `$command`;
+##############
+# Recurrence #
+##############
+
+foreach my $todo ( grep { TodoTxt::hasTag( $_, 'rec' ) } @todos ) {
+  my $newTodo = TodoTxt::advanceRecurrence( $todo );
+
+  printf( "Recurring: %s", $todo->{ 'src' } );
+
+  executeTodoSh( sprintf( 'add "%s"', $newTodo->{ 'src' } ) );
+}
+
+################
+# Mark as done #
+################
+
+executeTodoSh( "do " . join( ',', keys %done ) );
