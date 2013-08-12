@@ -62,7 +62,7 @@ sub modifyTag {
     exit 1;
   }
 
-  TodoTxt::modifyTag( $todo, $key, $value );
+  TodoTxt::setTag( $todo, $key, $value );
 }
 
 sub confirmDelete {

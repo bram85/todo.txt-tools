@@ -208,11 +208,17 @@ sub removeTag {
   delete $todo->{ 'tags' }->{ $key } unless @$values;
 }
 
-sub modifyTag {
+sub setTag {
   my ( $todo, $key, $value ) = @_;
 
-  $todo->{ 'src' } =~ s/\b$key:\S+\b/$key:$value/;
-  $todo->{ 'tags' }->{ $key } = $value;
+  return if hasTagValue( $todo, $key, $value );
+
+  if ( hasTag( $todo, $key ) ) {
+    $todo->{ 'src' } =~ s/\b$key:\S+\b/$key:$value/;
+    $todo->{ 'tags' }->{ $key } = $value;
+  } else {
+    addTag( $todo, $key, $value );
+  }
 }
 
 sub parseLine {
