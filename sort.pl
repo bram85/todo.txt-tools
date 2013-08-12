@@ -18,6 +18,8 @@
 
 use Getopt::Std;
 use Time::Piece;
+
+use lib 'lib';
 use TodoTxt;
 
 my %priority = (
