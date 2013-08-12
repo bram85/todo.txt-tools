@@ -280,6 +280,7 @@ sub getTodos {
   return \@todos;
 }
 
+my $todoCount = 0;
 sub readTodos {
   my $filename = $_[ 0 ];
 
@@ -290,10 +291,9 @@ sub readTodos {
     $fh = *STDIN;
   }
 
-  my $i = 1;
   while ( my $line = <$fh> ) {
     my $todo = parseLine( $line );
-    $todo->{ 'num' } = $i++;
+    $todo->{ 'num' } = ++$todoCount;
 
     push( @todos, $todo );
   }
