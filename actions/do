@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-use lib '..';
+use lib 'lib';
 use TodoTxt;
 use Depends;
 use Recurrence;
@@ -27,10 +27,24 @@ sub usage {
 }
 
 sub confirmDepsDone {
+  my $subtasks = $_[ 0 ];
+
+  print "Subtasks:\n";
+  print $_->{ 'src' } foreach values %$subtasks;
+
   print "Also mark subtasks as done? [n] " ;
   my $answer = <STDIN>;
 
   return $answer =~ /^y(es)?$/i;
+}
+
+sub gatherDependencies {
+  my $completed = $_[ 0 ];
+  my %subtasks;
+
+  map { $subtasks{ $_->{ 'num' } } = $_ } TodoTxt::getDependencies( $_ ) foreach @$completed;
+
+  return \%subtasks;
 }
 
 sub executeTodoSh {
@@ -47,19 +61,17 @@ my $force = $ENV{ 'TODOTXT_FORCE' };
 my $filename = $ENV{ 'TODO_DIR' } . "/todo.txt";
 TodoTxt::readTodos( $filename );
 
-my @done = split( ',', $ARGV[ 1 ] );
-my %done = map { $_ => 1 } @done;
-
-my @todos = map { TodoTxt::getTodo( $_ ) } @done;
+my @todos = map { TodoTxt::getTodo( $_ ) } split( ',', $ARGV[ 1 ] );
 
 ################
 # Dependencies #
 ################
 
-my $subTaskExists = grep { TodoTxt::hasTag( $_, 'id' ) } @todos;
+my $subtasks = gatherDependencies( \@todos );
 
-if ( $subTaskExists && !$force && confirmDepsDone() ) {
-  map { $done{ $_->{ 'num' } } = 1 } TodoTxt::getDependencies( $_ ) foreach @todos;
+if ( scalar keys %$subtasks && !$force && confirmDepsDone( $subtasks ) ) {
+  map { $subtasks->{ $_->{ 'num' } } = $_ } @todos;
+  @todos = values %$subtasks;
 }
 
 ##############
@@ -78,4 +90,4 @@ foreach my $todo ( grep { TodoTxt::hasTag( $_, 'rec' ) } @todos ) {
 # Mark as done #
 ################
 
-executeTodoSh( "do " . join( ',', keys %done ) );
+executeTodoSh( "do " . join( ',', map { $_->{ 'num' } } @todos ) );;

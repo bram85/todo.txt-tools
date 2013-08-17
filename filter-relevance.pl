@@ -18,6 +18,7 @@
 
 use strict;
 
+use lib 'lib';
 use TodoTxt;
 
 # A todo item is relevant iff:

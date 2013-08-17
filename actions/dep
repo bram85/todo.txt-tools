@@ -18,7 +18,7 @@
 
 use strict;
 
-use lib '..';
+use lib 'lib';
 use Depends;
 use TodoTxt;
 

@@ -20,7 +20,7 @@ use strict;
 
 use File::Spec;
 
-use lib '..';
+use lib 'lib';
 use TodoTxt;
 
 sub usage {

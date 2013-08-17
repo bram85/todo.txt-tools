@@ -18,6 +18,7 @@
 
 use strict;
 
+use lib 'lib';
 use Depends;
 use TodoTxt;
 
