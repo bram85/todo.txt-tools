@@ -26,18 +26,18 @@ use constant {
 
 sub getNewDate {
   my $recurrencePattern = $_[ 0 ];
-  my $then = localtime();
+  my $now = localtime();
 
   if ( $recurrencePattern =~ /^(\d+)([dwmy])$/ ) {
     my ( $amount, $period ) = ( $1, $2 );
 
-    $then += $amount * DAY               if $period eq 'd';
-    $then += $amount * WEEK              if $period eq 'w';
-    $then = $then->add_months( $amount ) if $period eq 'm';
-    $then = $then->add_years( $amount )  if $period eq 'y';
+    $now += $amount * DAY               if $period eq 'd';
+    $now += $amount * WEEK              if $period eq 'w';
+    $now = $now->add_months( $amount ) if $period eq 'm';
+    $now = $now->add_years( $amount )  if $period eq 'y';
   }
 
-  return $then;
+  return $now;
 }
 
 sub getLength {
