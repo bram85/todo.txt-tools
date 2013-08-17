@@ -28,9 +28,18 @@ sub getTaskByID {
   return @result ? $result[ 0 ] : 0;
 }
 
+sub taskExistsDependingOnID {
+  my $id = $_[ 0 ];
+
+  my $todos = TodoTxt::getTodos();
+  my @result = grep { TodoTxt::getTagValue( $_, 'p' ) eq $id } @$todos;
+
+  return @result;
+}
+
 sub getNewID {
   my $i = 1;
-  while ( getTaskByID( $i ) ) {
+  while ( getTaskByID( $i ) || taskExistsDependingOnID( $i ) ) {
     $i++;
   }
 
