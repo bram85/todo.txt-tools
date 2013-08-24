@@ -21,6 +21,11 @@ use POSIX;
 use Time::Piece;
 use Time::Seconds;
 
+use constant {
+  DAY => 60 * 60 * 24,
+  WEEK => 60 * 60 * 24 * 7
+};
+
 my @todos;
 
 sub getTodo {
@@ -316,6 +321,32 @@ sub writeTodos {
   print $fh $_->{ 'src' } foreach @todos;
 
   close( $fh ) if defined( $filename );;
+}
+
+sub convertRelativeDate {
+  my $recurrencePattern = $_[ 0 ];
+  my $now = localtime();
+
+  if ( $recurrencePattern =~ /^(\d+)([dwmy])$/ ) {
+    my ( $amount, $period ) = ( $1, $2 );
+
+    $now += $amount * DAY               if $period eq 'd';
+    $now += $amount * WEEK              if $period eq 'w';
+    $now = $now->add_months( $amount ) if $period eq 'm';
+    $now = $now->add_years( $amount )  if $period eq 'y';
+  }
+
+  return $now;
+}
+
+sub convertRelativeDateYMD {
+  my $pattern = $_[ 0 ];
+  my $date = convertRelativeDate( $pattern );
+  return $date->ymd;
+}
+
+sub isRecurrencePattern {
+  return $_[ 0 ] =~ /^\d+[dwmy]$/;
 }
 
 1;

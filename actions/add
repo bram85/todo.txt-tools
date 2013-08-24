@@ -18,7 +18,14 @@
 
 use Time::Piece;
 
+use lib 'lib';
+use TodoTxt;
+
 my $text = $ARGV[ 1 ];
+
+#################################
+# Add creation date, if missing #
+#################################
 
 $text =~ /^(\([A-Z]\) )?(\d{4}-\d{2}-\d{2} )?(.*)$/;
 my ( $priority, $creation, $remainder ) = ( $1, $2, $3 );
@@ -30,5 +37,28 @@ unless ( defined( $creation ) ) {
   $text = sprintf( "%s%s %s", $priority, $date, $remainder );
 }
 
-my $command = sprintf( "%s command add '%s'", $ENV{ 'TODO_FULL_SH' }, $text );
+################################################
+# Substitute relative dates with absolute ones #
+################################################
+
+my $todo = TodoTxt::parseLine( $text );
+
+sub replaceTag {
+  my $tag = $_[ 0 ];
+
+  my $pattern = TodoTxt::getTagValue( $todo, $tag );
+  if ( $pattern && TodoTxt::isRecurrencePattern( $pattern ) ) {
+    TodoTxt::setTag( $todo, $tag, TodoTxt::convertRelativeDateYMD( $pattern ) );
+  }
+}
+
+replaceTag( 'start' );
+replaceTag( 't' );
+replaceTag( 'due' );
+
+###########
+# Execute #
+###########
+
+my $command = sprintf( "%s command add '%s'", $ENV{ 'TODO_FULL_SH' }, $todo->{ 'src' } );
 print `$command`;

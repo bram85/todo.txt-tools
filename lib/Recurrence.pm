@@ -19,26 +19,8 @@ package TodoTxt;
 use Storable;
 use Time::Piece;
 
-use constant {
-  DAY => 60 * 60 * 24,
-  WEEK => 60 * 60 * 24 * 7
-};
-
-sub getNewDate {
-  my $recurrencePattern = $_[ 0 ];
-  my $now = localtime();
-
-  if ( $recurrencePattern =~ /^(\d+)([dwmy])$/ ) {
-    my ( $amount, $period ) = ( $1, $2 );
-
-    $now += $amount * DAY               if $period eq 'd';
-    $now += $amount * WEEK              if $period eq 'w';
-    $now = $now->add_months( $amount ) if $period eq 'm';
-    $now = $now->add_years( $amount )  if $period eq 'y';
-  }
-
-  return $now;
-}
+use lib 'lib';
+use TodoTxt;
 
 sub getLength {
   my $todo = $_[ 0 ];
@@ -57,7 +39,7 @@ sub advanceRecurrence {
 
   my $recurrence = TodoTxt::getTagValue( $todo, 'rec' );
 
-  my $newDueDate = getNewDate( $recurrence );
+  my $newDueDate = TodoTxt::convertRelativeDate( $recurrence );
 
   if ( hasStartDate( $todo ) ) {
     my $newStartDate = $newDueDate - DAY * getLength( $todo );
