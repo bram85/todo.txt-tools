@@ -323,25 +323,31 @@ sub writeTodos {
   close( $fh ) if defined( $filename );;
 }
 
+# input/output: Time::Piece
 sub convertRelativeDate {
   my $recurrencePattern = $_[ 0 ];
-  my $now = localtime();
+  my $offset = defined( $_[ 1 ] ) ? $_[ 1 ] : localtime();
 
   if ( $recurrencePattern =~ /^(\d+)([dwmy])$/ ) {
     my ( $amount, $period ) = ( $1, $2 );
 
-    $now += $amount * DAY               if $period eq 'd';
-    $now += $amount * WEEK              if $period eq 'w';
-    $now = $now->add_months( $amount ) if $period eq 'm';
-    $now = $now->add_years( $amount )  if $period eq 'y';
+    $offset += $amount * DAY               if $period eq 'd';
+    $offset += $amount * WEEK              if $period eq 'w';
+    $offset = $offset->add_months( $amount ) if $period eq 'm';
+    $offset = $offset->add_years( $amount )  if $period eq 'y';
   }
 
-  return $now;
+  return $offset;
 }
 
-sub convertRelativeDateYMD {
+# input/output: string YYYY-MM-DD
+sub convertRelativeDateString {
   my $pattern = $_[ 0 ];
-  my $date = convertRelativeDate( $pattern );
+  my $offset = $_[ 1 ];
+
+  $offset = defined( $offset ) && isDate( $offset ) ? parseDate( $offset ) : undef;
+
+  my $date = convertRelativeDate( $pattern, $offset );
   return $date->ymd;
 }
 
