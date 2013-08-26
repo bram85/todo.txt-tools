@@ -1,0 +1,74 @@
+#!/usr/bin/env perl
+
+# TodoTxt Tools
+# Copyright (C) 2013 Bram Schoenmakers <me@bramschoenmakers.nl>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+use Time::Piece;
+
+use lib 'lib';
+use TodoTxt;
+
+my $filename = $ENV{ 'TODO_DIR' } . "/todo.txt";
+my $todos = TodoTxt::readTodos( $filename );
+
+sub usage {
+  print STDERR <<END;
+Usage: todo.sh postpone TASK#[,TASK#,...] <date>
+       todo.sh postpone TASK#[,TASK#,...] <pattern>
+
+Example:
+       todo.sh postpone 1 1w
+       Postpones task 1 with one week.
+END
+  exit 1;
+}
+
+sub setNewDueDate {
+  my ( $todo, $date ) = @_;
+
+  my $due = TodoTxt::getTagValue( $todo, 'due' );
+  my $newDate = TodoTxt::isDate( $date ) ? $date : TodoTxt::convertRelativeDateString( $date, $due );
+
+  TodoTxt::setTag( $todo, 'due', $newDate );
+}
+
+my @numbers = grep { /\d+/ } split( ',', $ARGV[ 1 ] );
+my $date = $ARGV[2 ];
+
+if ( !@numbers || ( !TodoTxt::isDate( $date ) && !TodoTxt::isRecurrencePattern( $date ) ) ) {
+  usage();
+}
+
+my $dirty = 0;
+foreach my $number ( @numbers ) {
+  my $todo = TodoTxt::getTodo( $number );
+
+  unless ( $todo ) {
+    print STDERR "Error: Task $number does not exist.\n";
+    next;
+  }
+
+  unless ( TodoTxt::hasDueDate( $todo ) ) {
+    print STDERR "Warning: Task $number has no due date.\n";
+    next;
+  }
+
+  setNewDueDate( $todo, $date );
+  print $todo->{ 'src' };
+  $dirty = 1;
+}
+
+TodoTxt::writeTodos( $filename ) if $dirty;
