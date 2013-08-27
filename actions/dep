@@ -31,6 +31,7 @@ Usage: todo.sh dep add TASK# to TASK#
        todo.sh dep rm  TASK# to TASK#
        todo.sh dep ls  TASK# to
        todo.sh dep ls        to TASK#
+       todo.sh dot TASK# | TEXT
 
 Example:
        todo.sh dep add 60 to 58
@@ -67,6 +68,81 @@ sub cleanIds {
   }
 }
 
+sub makeSelection {
+  my $selector = $_[ 0 ];
+  my @result;
+
+  if ( !defined( $selector ) ) {
+    @result = @$todos;
+  }
+  elsif ( $selector =~ /\d+/ ) {
+    my $todo = getTodo( $selector );
+    @result = TodoTxt::getDependencies( $todo );
+
+    # make sure not to add the same node twice (in case of cyclic dependencies)
+    push( @result, $todo ) unless grep { $todo->{ 'src' } eq $_->{ 'src' } } @result;
+  } else {
+    @result = grep { $_->{ 'src' } =~ /\Q$selector/ } @$todos;
+  }
+
+  return @result;
+}
+
+sub normalizeText {
+  my $text = $_[ 0 ];
+  chomp $text;
+  $text =~ s/"/\\"/g;
+  return $text;
+}
+
+sub printNodes {
+  my $todos = $_[ 0 ];
+
+  foreach my $todo ( @$todos ) {
+    my $src = normalizeText( $todo->{ 'src' } );
+    printf( "  %d [ tooltip=\"%s\" ]\n", $todo->{ 'num' }, $src );
+  }
+}
+
+sub printEdges {
+  my $todos = $_[ 0 ];
+  my %edges;
+
+  foreach my $todo ( @$todos ) {
+    my @dependencies = TodoTxt::getDirectDependencies( $todo );
+    my $from = $todo->{ 'num' };
+
+    printf( "  %d -> %d\n", $from, $_->{ 'num' } ) foreach @dependencies;
+  }
+
+  return \%edges;
+}
+
+sub printLegend {
+  my $todos = $_[ 0 ];
+
+  my $label = "";
+
+  foreach my $todo ( @$todos ) {
+    my $src = normalizeText( $todo->{ 'src' } );
+    $label .= sprintf( "%d %s\\l", $todo->{ 'num' }, $src );
+  }
+
+  printf( "legend [ fontsize=8,shape=box, label=\"%s\" ]\n", $label );
+}
+
+sub printDot {
+  my $todos = $_[ 0 ];
+
+  print "digraph todo {\n";
+
+  printNodes( $todos );
+  printEdges( $todos );
+  printLegend( $todos );
+
+  print "}\n";
+}
+
 my $subcommand = $ARGV[ 1 ];
 
 if ( $subcommand =~ /^(add|rm)$/ ) {
@@ -99,6 +175,12 @@ elsif ( $subcommand eq "ls" ) {
 } elsif ( $subcommand =~ /^(clean|gc)$/ ) {
   cleanIds();
   TodoTxt::writeTodos( $filename );
+} elsif ( $subcommand eq 'dot' ) {
+  my $selector = $ARGV[ 2 ];
+
+  my @printTodos = makeSelection( $selector );
+  printDot( \@printTodos );
+
 } else {
   usage();
 }
