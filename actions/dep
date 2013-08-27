@@ -127,7 +127,7 @@ sub printLegend {
     $label .= sprintf( "%d %s\\l", $todo->{ 'num' }, $src );
   }
 
-  printf( "legend [ fontsize=8,shape=box, label=\"%s\" ]\n", $label );
+  printf( "  legend [ fontsize=8,shape=box, label=\"%s\" ]\n", $label );
 }
 
 sub printDot {
