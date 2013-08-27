@@ -48,7 +48,7 @@ sub replaceTag {
 
   my $pattern = TodoTxt::getTagValue( $todo, $tag );
   if ( $pattern && TodoTxt::isRecurrencePattern( $pattern ) ) {
-    TodoTxt::setTag( $todo, $tag, TodoTxt::convertRelativeDateString( $pattern ) );
+    TodoTxt::setTagValue( $todo, $tag, TodoTxt::convertRelativeDateString( $pattern ) );
   }
 }
 

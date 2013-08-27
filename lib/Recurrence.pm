@@ -45,7 +45,7 @@ sub advanceRecurrence {
 
   if ( hasTag( $todo, 't' ) ) {
     my $newStartDate = $newDueDate - DAY * getLength( $todo );
-    TodoTxt::setTag( $clone, 't', $newStartDate->ymd );
+    TodoTxt::setTagValue( $clone, 't', $newStartDate->ymd );
   }
 
   TodoTxt::setTag( $clone, 'due', $newDueDate->ymd );

@@ -197,7 +197,7 @@ sub removeTag {
   delete $todo->{ 'tags' }->{ $key } unless @$values;
 }
 
-sub setTag {
+sub setTagValue {
   my ( $todo, $key, $value ) = @_;
 
   return if hasTagValue( $todo, $key, $value );

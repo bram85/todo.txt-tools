@@ -42,7 +42,7 @@ sub setNewDueDate {
   my $due = TodoTxt::getTagValue( $todo, 'due' );
   my $newDate = TodoTxt::isDate( $date ) ? $date : TodoTxt::convertRelativeDateString( $date, $due );
 
-  TodoTxt::setTag( $todo, 'due', $newDate );
+  TodoTxt::setTagValue( $todo, 'due', $newDate );
 }
 
 my @numbers = grep { /\d+/ } split( ',', $ARGV[ 1 ] );
