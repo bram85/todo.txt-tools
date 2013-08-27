@@ -74,16 +74,6 @@ sub getProject {
   return $1;
 }
 
-sub isDueDate {
-  my ( $key, $value ) = isKeyValue( $_[ 0 ] );
-  return $key eq 'due' && isDate( $value ) ? $value : 0;
-}
-
-sub isStartDate {
-  my ( $key, $value ) = isKeyValue( $_[ 0 ] );
-  return $key eq 't' && isDate( $value ) ? $value : 0;
-}
-
 sub isCompleted {
   my $todo = $_[ 0 ];
   return defined( $todo->{ 'completed' } ) && $todo->{ 'completed' } == 1;
@@ -135,29 +125,8 @@ sub getDaysUntil {
 
 sub getDaysLeft {
   my $todo = $_[ 0 ];
-  return getDaysUntil( $todo->{ 'due' } );
-}
-
-sub hasStartDate {
-  return defined( $_[ 0 ]->{ 'start' } );
-}
-
-sub setStartDate {
-  my ( $todo, $start ) = @_;
-
-  $todo->{ 'start' } = $start;
-  setTag( $todo, 'start', $start ) if hasTag( $todo, 'start' );
-  setTag( $todo, 't', $start ) if hasTag( $todo, 't' );
-}
-
-sub hasDueDate {
-  return defined( $_[ 0 ]->{ 'due' } );
-}
-
-sub setDueDate {
-  my ( $todo, $due ) = @_;
-  $todo->{ 'due' } = $due;
-  setTag( $todo, 'due', $due );
+  my $due = getTagValue( $todo, 'due' );
+  return getDaysUntil( $due );
 }
 
 sub hasTag {
@@ -190,12 +159,13 @@ sub getTagValues {
 
 sub isOverdue {
   my $todo = $_[ 0 ];
-  return !hasDueDate( $todo ) || getDaysLeft( $todo ) < 0;
+  return !hasTag( $todo, 'due' ) || getDaysLeft( $todo ) < 0;
 }
 
 sub isActive {
   my $todo = $_[ 0 ];
-  return !hasStartDate( $todo ) || getDaysUntil( $todo->{ 'start' } ) <= 0;
+  my $start = TodoTxt::getTagValue( $todo, 't' );
+  return !$start || getDaysUntil( $start ) <= 0;
 }
 
 sub hasPriority {
@@ -253,15 +223,11 @@ sub parseLine {
 
   while ( my $word = shift @words ) {
     my ( $key, $value ) = isKeyValue( $word );
-    push( @{$todo{ 'tags' }->{ $key }}, $value ) if $key;
 
-    my $startDate = isStartDate( $word );
-    $todo{ 'start' } = $startDate if $startDate;
-
-    my $dueDate = isDueDate( $word );
-    $todo{ 'due' } = $dueDate if $dueDate;
-
-    next if $key; # it was some other key:value, we got it
+    if ( $key ) {
+      push( @{$todo{ 'tags' }->{ $key }}, $value ) if $key;
+      next;
+    }
 
     if ( isContext( $word ) ) {
       $todo{ 'context' }->{ getContext( $word ) } = 1;

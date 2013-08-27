@@ -68,7 +68,8 @@ sub getImportance {
       # importance
 
       my $now = localtime();
-      my $due = TodoTxt::parseDate( $todo->{ 'due' } );
+      my $dueString = TodoTxt::getTagValue( $todo, 'due' );
+      my $due = TodoTxt::parseDate( $dueString );
       my $diff = $due - $now;
 
       # between Friday 0:00 and Monday 23:59 (a span of less than 4 days)

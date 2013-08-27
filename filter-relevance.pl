@@ -41,11 +41,11 @@ foreach my $todo ( @$todos ) {
   next if !TodoTxt::isActive( $todo );
 
   next if $todo->{ 'priority' } eq 'B'
-       && TodoTxt::hasDueDate( $todo )
+       && TodoTxt::hasTag( $todo, 'due' )
        && TodoTxt::getDaysLeft( $todo ) > 30;
 
   next if ( $todo->{ 'priority' } ne 'A' && $todo->{ 'priority' } ne 'B' )
-       && TodoTxt::hasDueDate( $todo )
+       && TodoTxt::hasTag( $todo, 'due' )
        && TodoTxt::getDaysLeft( $todo ) > 14;
 
   print $todo->{ 'src' };

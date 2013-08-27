@@ -61,7 +61,7 @@ foreach my $number ( @numbers ) {
     next;
   }
 
-  unless ( TodoTxt::hasDueDate( $todo ) ) {
+  unless ( TodoTxt::hasTag( $todo, 'due' ) ) {
     print STDERR "Warning: Task $number has no due date.\n";
     next;
   }

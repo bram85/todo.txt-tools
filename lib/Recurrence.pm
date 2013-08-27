@@ -25,10 +25,12 @@ use TodoTxt;
 sub getLength {
   my $todo = $_[ 0 ];
 
-  return 0 unless hasStartDate( $todo ) && hasDueDate( $todo );
+  return 0 unless hasTag( $todo, 't' ) && hasTag( $todo, 'due' );
 
-  my $start = TodoTxt::parseDate( $todo->{ 'start' } );
-  my $due = TodoTxt::parseDate( $todo->{ 'due' } );
+  my $startString = TodoTxt::getTagValue( $todo, 't' );
+  my $start = TodoTxt::parseDate( $startString );
+  my $dueString = TodoTxt::getTagValue( $todo, 'due' );
+  my $due = TodoTxt::parseDate( $dueString );
 
   return getDateDifference( $start, $due );
 }
@@ -41,12 +43,12 @@ sub advanceRecurrence {
 
   my $newDueDate = TodoTxt::convertRelativeDate( $recurrence );
 
-  if ( hasStartDate( $todo ) ) {
+  if ( hasTag( $todo, 't' ) ) {
     my $newStartDate = $newDueDate - DAY * getLength( $todo );
-    TodoTxt::setStartDate( $clone, $newStartDate->ymd );
+    TodoTxt::setTag( $clone, 't', $newStartDate->ymd );
   }
 
-  TodoTxt::setDueDate( $clone, $newDueDate->ymd );
+  TodoTxt::setTag( $clone, 'due', $newDueDate->ymd );
 
   return $clone;
 }

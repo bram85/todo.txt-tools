@@ -52,7 +52,6 @@ sub replaceTag {
   }
 }
 
-replaceTag( 'start' );
 replaceTag( 't' );
 replaceTag( 'due' );
 
