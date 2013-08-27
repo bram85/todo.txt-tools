@@ -143,7 +143,7 @@ sub sortTodos {
 
 my $todos = TodoTxt::readTodos( $ARGV[ 0 ] );
 foreach my $t ( sort sortTodos @$todos ) {
-  print $t->{ 'src' };
+  print $t->{ 'src' } . "\n";
 }
 
 exit 0;

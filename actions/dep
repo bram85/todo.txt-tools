@@ -88,9 +88,8 @@ sub makeSelection {
   return @result;
 }
 
-sub normalizeText {
+sub escapeQuotes {
   my $text = $_[ 0 ];
-  chomp $text;
   $text =~ s/"/\\"/g;
   return $text;
 }
@@ -99,7 +98,7 @@ sub printNodes {
   my $todos = $_[ 0 ];
 
   foreach my $todo ( @$todos ) {
-    my $src = normalizeText( $todo->{ 'src' } );
+    my $src = escapeQuotes( $todo->{ 'src' } );
     printf( "  %d [ tooltip=\"%s\" ]\n", $todo->{ 'num' }, $src );
   }
 }
@@ -124,7 +123,7 @@ sub printLegend {
   my $label = "";
 
   foreach my $todo ( @$todos ) {
-    my $src = normalizeText( $todo->{ 'src' } );
+    my $src = escapeQuotes( $todo->{ 'src' } );
     $label .= sprintf( "%d %s\\l", $todo->{ 'num' }, $src );
   }
 

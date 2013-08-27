@@ -212,6 +212,7 @@ sub setTagValue {
 
 sub parseLine {
   my $line = $_[ 0 ];
+  chomp $line;
 
   my @words = split( " ", $line );
   map { s/\e\[?.*?[\@-~]//g } @words; # strip ANSI codes
@@ -284,7 +285,7 @@ sub writeTodos {
     $fh = *STDOUT;
   }
 
-  print $fh $_->{ 'src' } foreach @todos;
+  print $fh $_->{ 'src' } . "\n" foreach @todos;
 
   close( $fh ) if defined( $filename );;
 }

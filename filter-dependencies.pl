@@ -37,5 +37,5 @@ sub hasUnfinishedDependencies {
 
 my $todos = TodoTxt::readTodos( $ARGV[ 0 ] );
 foreach my $todo ( @$todos ) {
-  print $todo->{ 'src' } unless hasUnfinishedDependencies( $todo );
+  print $todo->{ 'src' } . "\n" unless hasUnfinishedDependencies( $todo );
 }
