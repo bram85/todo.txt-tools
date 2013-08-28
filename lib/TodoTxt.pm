@@ -205,7 +205,8 @@ sub setTagValue {
   if ( hasTag( $todo, $key ) ) {
     $todo->{ 'src' } =~ s/\b$key:\S+\b/$key:$value/;
     $todo->{ 'tags' }->{ $key } = $value;
-  } else {
+  }
+  else {
     addTag( $todo, $key, $value );
   }
 }
@@ -259,7 +260,8 @@ sub readTodos {
   my $fh;
   if ( defined( $filename ) ) {
     open( $fh, "<$filename" ) or die "Cannot open $filename.";
-  } else {
+  }
+  else {
     $fh = *STDIN;
   }
 
@@ -281,7 +283,8 @@ sub writeTodos {
   my $fh;
   if ( defined( $filename ) ) {
     open( $fh, ">$filename" ) or die "Cannot write to $filename.";
-  } else {
+  }
+  else {
     $fh = *STDOUT;
   }
 

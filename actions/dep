@@ -81,7 +81,8 @@ sub makeSelection {
 
     # make sure not to add the same node twice (in case of cyclic dependencies)
     push( @result, $todo ) unless grep { $todo->{ 'src' } eq $_->{ 'src' } } @result;
-  } else {
+  }
+  else {
     @result = grep { $_->{ 'src' } =~ /\Q$selector/ } @$todos;
   }
 
@@ -171,15 +172,18 @@ elsif ( $subcommand eq "ls" ) {
   else {
     usage();
   }
-} elsif ( $subcommand =~ /^(clean|gc)$/ ) {
+}
+elsif ( $subcommand =~ /^(clean|gc)$/ ) {
   cleanIds();
   TodoTxt::writeTodos( $filename );
-} elsif ( $subcommand eq 'dot' ) {
+}
+elsif ( $subcommand eq 'dot' ) {
   my $selector = $ARGV[ 2 ];
 
   my @printTodos = makeSelection( $selector );
   printDot( \@printTodos );
 
-} else {
+}
+else {
   usage();
 }
