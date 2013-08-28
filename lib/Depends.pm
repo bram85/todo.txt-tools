@@ -105,4 +105,9 @@ sub removeDependency {
   TodoTxt::removeTag( $fromTask, 'id' ) unless getDirectDependencies( $fromTask );
 }
 
+sub pathExists {
+  my ( $from, $to ) = @_;
+  return grep { $_->{ 'src' } eq $to->{ 'src' } } TodoTxt::getDependencies( $from );
+}
+
 1;

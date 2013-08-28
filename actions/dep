@@ -53,6 +53,19 @@ sub getTodo {
   return $todo;
 }
 
+sub transitiveReduction {
+  foreach my $todo ( @$todos ) {
+    my @dependencies = TodoTxt::getDirectDependencies( $todo );
+
+    foreach my $dep1 ( @dependencies ) {
+      foreach my $dep2 ( @dependencies ) {
+        next if $dep1->{ 'num' } == $dep2->{ 'num' };
+        TodoTxt::removeDependency( $todo, $dep2 ) if TodoTxt::pathExists( $dep1, $dep2 );
+      }
+    }
+  }
+}
+
 sub cleanIds {
   # clean id's which are no longer referred to
   foreach my $todo ( @$todos ) {
@@ -66,6 +79,8 @@ sub cleanIds {
       TodoTxt::removeTag( $todo, 'p', $parent ) unless TodoTxt::getTaskByID( $parent );
     }
   }
+
+  transitiveReduction();
 }
 
 sub makeSelection {
