@@ -100,16 +100,16 @@ if ( !defined( $key ) && !defined( $value ) ) {
 }
 elsif ( !$hasTag && defined( $value ) ) {
   TodoTxt::addTag( $todo, $key, $value );
-  print $todo->{ 'src' };
+  print $todo->{ 'src' } . "\n";
 }
 elsif( TodoTxt::hasTag( $todo, $key ) ) {
   if ( defined( $value ) ) {
     modifyTag( $todo, $key, $value );
-    print $todo->{ 'src' };
+    print $todo->{ 'src' } . "\n";
   }
   else {
     TodoTxt::removeTag( $todo, $key ) if $force || confirmDelete( $key );
-    print $todo->{ 'src' };
+    print $todo->{ 'src' } . "\n";
   }
 }
 else {
