@@ -322,4 +322,9 @@ sub isRecurrencePattern {
   return $_[ 0 ] =~ /^\d+[dwmy]$/;
 }
 
+sub printTodo {
+  my $todo = $_[ 0 ];
+  print $todo->{ 'src' } . "\n";
+}
+
 1;

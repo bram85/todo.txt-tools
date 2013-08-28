@@ -67,7 +67,7 @@ foreach my $number ( @numbers ) {
   }
 
   setNewDueDate( $todo, $date );
-  print $todo->{ 'src' };
+  TodoTxt::printTodo( $todo );
   $dirty = 1;
 }
 

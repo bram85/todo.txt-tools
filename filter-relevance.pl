@@ -48,6 +48,6 @@ foreach my $todo ( @$todos ) {
        && TodoTxt::hasTag( $todo, 'due' )
        && TodoTxt::getDaysLeft( $todo ) > 14;
 
-  print $todo->{ 'src' } . "\n";
+  TodoTxt::printTodo( $todo );
 }
 

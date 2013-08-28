@@ -160,13 +160,13 @@ elsif ( $subcommand eq "ls" ) {
     # print all tasks referring to given task number
     my $todo = getTodo( $ARGV[ 3 ] );
     my @parents = TodoTxt::getTagValues( $todo, 'p' );
-    print $_->{ 'src' } foreach map { TodoTxt::getTaskByID( $_ ) } @parents;
+    TodoTxt::printTodo( $_ ) foreach map { TodoTxt::getTaskByID( $_ ) } @parents;
   }
   elsif ( $ARGV[ 2 ] =~ /\d+/ && $ARGV[ 3 ] eq "to" ) {
     # print all tasks the given task refers to
     my $todo = getTodo( $ARGV[ 2 ] );
     my @dependencies = TodoTxt::getDependencies( $todo );
-    print $_->{ 'src' } foreach @dependencies;
+    TodoTxt::printTodo( $_ ) foreach @dependencies;
   }
   else {
     usage();

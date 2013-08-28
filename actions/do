@@ -30,7 +30,7 @@ sub confirmDepsDone {
   my $subtasks = $_[ 0 ];
 
   print "Subtasks:\n";
-  print $_->{ 'src' } foreach values %$subtasks;
+  TodoTxt::printTodo( $_ ) foreach values %$subtasks;
 
   print "Also mark subtasks as done? [n] " ;
   my $answer = <STDIN>;
@@ -81,7 +81,7 @@ if ( scalar keys %$subtasks && !$force && confirmDepsDone( $subtasks ) ) {
 foreach my $todo ( grep { TodoTxt::hasTag( $_, 'rec' ) } @todos ) {
   my $newTodo = TodoTxt::advanceRecurrence( $todo );
 
-  printf( "Recurring: %s", $todo->{ 'src' } );
+  printf( "Recurring: %s", $todo->{ 'src' } . "\n" );
 
   executeTodoSh( sprintf( 'add "%s"', $newTodo->{ 'src' } ) );
 }
