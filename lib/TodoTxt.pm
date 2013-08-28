@@ -30,7 +30,7 @@ my @todos;
 
 sub getTodo {
   my $taskNumber = $_[ 0 ];
-  return $taskNumber > 0 && $taskNumber <= scalar @todos ? $todos[ $taskNumber - 1 ] : 0;
+  return $taskNumber > 0 && $taskNumber <= scalar @todos ? $todos[ $taskNumber - 1 ] : undef;
 }
 
 sub parseDate {
@@ -147,7 +147,7 @@ sub getTagValue {
   my ( $todo, $key ) = @_;
 
   my @values = getTagValues( $todo, $key );
-  return @values ? $values[ 0 ] : 0;
+  return @values ? $values[ 0 ] : undef;
 }
 
 sub getTagValues {
