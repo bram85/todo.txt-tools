@@ -295,10 +295,10 @@ sub writeTodos {
 
 # input/output: Time::Piece
 sub convertRelativeDate {
-  my $recurrencePattern = $_[ 0 ];
+  my $pattern = $_[ 0 ];
   my $offset = defined( $_[ 1 ] ) ? $_[ 1 ] : localtime();
 
-  if ( $recurrencePattern =~ /^(\d+)([dwmy])$/ ) {
+  if ( $pattern =~ /^(\d+)([dwmy])$/ ) {
     my ( $amount, $period ) = ( $1, $2 );
 
     $offset += $amount * DAY               if $period eq 'd';
@@ -308,7 +308,7 @@ sub convertRelativeDate {
   }
   else {
     $offset = localtime();
-    $offset += DAY if $recurrencePattern eq 'tomorrow';
+    $offset += DAY if $pattern eq 'tomorrow';
   }
 
   return $offset;
