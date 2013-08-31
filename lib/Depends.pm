@@ -54,34 +54,47 @@ sub assignID {
   return $id;
 }
 
+sub todoEquals {
+  my ( $todo1, $todo2 ) = @_;
+  return $todo1->{ 'num' } == $todo2->{ 'num' };
+}
+
+sub arrayHasTodo {
+  my ( $array, $todo ) = @_;
+
+  return grep { todoEquals( $_, $todo ) } @$array;
+}
+
 sub getDependencies {
   my $root = $_[ 0 ];
   my $recursive = defined( $_[ 1 ] ) ? $_[ 1 ] : 1;
 
-  my %result = ();
-  my @queue = ( $root );
+  my @result = ();
+  my @stack = ( $root );
+  $root->{ 'level' } = 0;
 
   my $todos = TodoTxt::getTodos();
 
-  while ( @queue ) {
-    my $todo = shift @queue;
+  while ( @stack ) {
+    my $todo = pop @stack;
     my $id = TodoTxt::getTagValue( $todo, 'id' );
 
     next unless $id;
 
     my @newDeps = grep { TodoTxt::hasTagValue( $_, 'p', $id ) } @$todos;
 
-    foreach my $newDep ( @newDeps ) {
-      unless ( exists( $result{ $newDep->{ 'src' } } ) ) {
-        $result{ $newDep->{ 'src' } } = $newDep;
-        push( @queue, $newDep );
+    foreach my $newDep ( reverse @newDeps ) {
+      unless ( todoEquals( $root, $newDep ) || arrayHasTodo( \@result, $newDep ) ) {
+        push( @result, $newDep );
+        $newDep->{ 'level' } = $todo->{ 'level' } + 1;
+        push( @stack, $newDep );
       }
     }
 
     last unless $recursive;
   }
 
-  return values %result;
+  return @result;
 }
 
 sub getDirectDependencies {
