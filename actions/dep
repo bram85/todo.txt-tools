@@ -31,6 +31,7 @@ Usage: todo.sh dep add TASK# to TASK#
        todo.sh dep rm  TASK# to TASK#
        todo.sh dep ls  TASK# to
        todo.sh dep ls        to TASK#
+       todo.sh dep gc
        todo.sh dot TASK# | TEXT
 
 Example:
