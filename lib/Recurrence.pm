@@ -21,6 +21,7 @@ use Time::Piece;
 
 use lib 'lib';
 use TodoTxt;
+use RelativeDate;
 
 sub getLength {
   my $todo = $_[ 0 ];
