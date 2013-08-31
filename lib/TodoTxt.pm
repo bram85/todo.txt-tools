@@ -306,6 +306,10 @@ sub convertRelativeDate {
     $offset = $offset->add_months( $amount ) if $period eq 'm';
     $offset = $offset->add_years( $amount )  if $period eq 'y';
   }
+  else {
+    $offset = localtime();
+    $offset += DAY if $recurrencePattern eq 'tomorrow';
+  }
 
   return $offset;
 }
@@ -322,7 +326,7 @@ sub convertRelativeDateString {
 }
 
 sub isRecurrencePattern {
-  return $_[ 0 ] =~ /^\d+[dwmy]$/;
+  return $_[ 0 ] =~ /^\d+[dwmy]|today|tomorrow$/;
 }
 
 sub printTodo {
