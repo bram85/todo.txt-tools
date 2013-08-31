@@ -111,6 +111,18 @@ sub escapeQuotes {
   return $text;
 }
 
+sub printTree {
+  my $root = $_[ 0 ];
+
+  my @dependencies = TodoTxt::getDependencies( $root );
+  TodoTxt::printTodo( $root );
+
+  foreach my $dependency ( @dependencies ) {
+    printf( "%s", "  " x $dependency->{ 'level' } );
+    TodoTxt::printTodo( $dependency );
+  }
+}
+
 sub printNodes {
   my $todos = $_[ 0 ];
 
@@ -182,8 +194,7 @@ elsif ( $subcommand eq "ls" ) {
   elsif ( $ARGV[ 2 ] =~ /\d+/ && $ARGV[ 3 ] eq "to" ) {
     # print all tasks the given task refers to
     my $todo = getTodo( $ARGV[ 2 ] );
-    my @dependencies = TodoTxt::getDependencies( $todo );
-    TodoTxt::printTodo( $_ ) foreach @dependencies;
+    printTree( $todo );
   }
   else {
     usage();
@@ -198,7 +209,6 @@ elsif ( $subcommand eq 'dot' ) {
 
   my @printTodos = makeSelection( $selector );
   printDot( \@printTodos );
-
 }
 else {
   usage();
