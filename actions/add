@@ -46,9 +46,15 @@ my $todo = TodoTxt::parseLine( $text );
 sub replaceTag {
   my $tag = $_[ 0 ];
 
-  my $pattern = TodoTxt::getTagValue( $todo, $tag );
-  if ( $pattern && TodoTxt::isRelativeDatePattern( $pattern ) ) {
-    TodoTxt::setTagValue( $todo, $tag, TodoTxt::convertRelativeDateString( $pattern ) );
+  my $value = TodoTxt::getTagValue( $todo, $tag );
+
+  if ( $value && !TodoTxt::isDate( $value ) ) {
+    unless ( TodoTxt::isRelativeDatePattern( $value ) ) {
+      print STDERR "Warning: $value is not a valid date.\n";
+      $value = "today";
+    }
+
+    TodoTxt::setTagValue( $todo, $tag, TodoTxt::convertRelativeDateString( $value ) );
   }
 }
 
