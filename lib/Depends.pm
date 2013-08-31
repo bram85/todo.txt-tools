@@ -120,7 +120,7 @@ sub removeDependency {
 
 sub pathExists {
   my ( $from, $to ) = @_;
-  return grep { $_->{ 'src' } eq $to->{ 'src' } } TodoTxt::getDependencies( $from );
+  return grep { $_->{ 'src' } eq $to->{ 'src' } } getDependencies( $from );
 }
 
 1;
