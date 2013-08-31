@@ -21,11 +21,6 @@ use POSIX;
 use Time::Piece;
 use Time::Seconds;
 
-use constant {
-  DAY => 60 * 60 * 24,
-  WEEK => 60 * 60 * 24 * 7
-};
-
 my @todos;
 
 sub getTodo {
@@ -291,74 +286,6 @@ sub writeTodos {
   print $fh $_->{ 'src' } . "\n" foreach @todos;
 
   close( $fh ) if defined( $filename );;
-}
-
-sub convertPattern {
-  my $pattern = $_[ 0 ];
-  my $offset = $_[ 1 ];
-
-  my ( $amount, $period ) = ( $1, $2 );
-
-  $offset += $amount * DAY               if $period eq 'd';
-  $offset += $amount * WEEK              if $period eq 'w';
-  $offset = $offset->add_months( $amount ) if $period eq 'm';
-  $offset = $offset->add_years( $amount )  if $period eq 'y';
-
-  return $offset;
-}
-
-sub convertWordPattern {
-  my $pattern = $_[ 0 ];
-  my $offset = localtime();
-
-  return convertPattern( "0d", $offset ) if $pattern eq "today";
-  return convertPattern( "1d", $offset ) if $pattern eq "tomorrow";
-}
-
-sub convertWeekdayPattern {
-  my $targetDay = $_[ 0 ];
-  my $offset = localtime();
-
-  my $day = $offset->day;
-  while ( $targetDay !~ /$day/i ) {
-    $offset += DAY;
-    $day = $offset->day;
-  }
-
-  return $offset;
-}
-
-# input/output: Time::Piece
-sub convertRelativeDate {
-  my $pattern = $_[ 0 ];
-  my $offset = defined( $_[ 1 ] ) ? $_[ 1 ] : localtime();
-
-  if ( $pattern =~ /^(\d+)([dwmy])$/i ) {
-    $offset = convertPattern( $pattern, $offset );
-  }
-  elsif ( $pattern =~ /^(today|tomorrow)$/i ) {
-    $offset = convertWordPattern( $pattern );
-  }
-  else {
-    $offset = convertWeekdayPattern( $pattern );
-  }
-
-  return $offset;
-}
-
-# input/output: string YYYY-MM-DD
-sub convertRelativeDateString {
-  my $pattern = $_[ 0 ];
-  my $offset = $_[ 1 ];
-
-  $offset = defined( $offset ) && isDate( $offset ) ? parseDate( $offset ) : undef;
-
-  my $date = convertRelativeDate( $pattern, $offset );
-  return $date->ymd;
-}
-
-sub isRelativeDatePattern {
-  return $_[ 0 ] =~ /^(\d+[dwmy]|today|tomorrow|mon(day)?|tue(sday)?|wed(nesday)?|thu(rsday)?|fri(day)?|sat(day)?|sun(day)?)$/i;
 }
 
 sub printTodo {

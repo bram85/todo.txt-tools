@@ -20,6 +20,7 @@ use Time::Piece;
 
 use lib 'lib';
 use TodoTxt;
+use RelativeDate;
 
 my $text = $ARGV[ 1 ];
 
