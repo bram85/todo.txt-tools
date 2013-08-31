@@ -48,7 +48,7 @@ sub setNewDueDate {
 my @numbers = grep { /\d+/ } split( ',', $ARGV[ 1 ] );
 my $date = $ARGV[2 ];
 
-if ( !@numbers || ( !TodoTxt::isDate( $date ) && !TodoTxt::isRecurrencePattern( $date ) ) ) {
+if ( !@numbers || ( !TodoTxt::isDate( $date ) && !TodoTxt::isRelativeDatePattern( $date ) ) ) {
   usage();
 }
 
