@@ -27,6 +27,7 @@ sub convertPattern {
   my $pattern = $_[ 0 ];
   my $offset = $_[ 1 ];
 
+  $pattern =~ /^(\d+)([dwmy])$/i;
   my ( $amount, $period ) = ( $1, $2 );
 
   $offset += $amount * DAY               if $period eq 'd';
@@ -63,7 +64,7 @@ sub convertRelativeDate {
   my $pattern = $_[ 0 ];
   my $offset = defined( $_[ 1 ] ) ? $_[ 1 ] : localtime();
 
-  if ( $pattern =~ /^(\d+)([dwmy])$/i ) {
+  if ( $pattern =~ /^\d+[dwmy]$/i ) {
     $offset = convertPattern( $pattern, $offset );
   }
   elsif ( $pattern =~ /^(today|tomorrow)$/i ) {
