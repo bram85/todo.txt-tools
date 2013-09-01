@@ -163,11 +163,6 @@ sub isActive {
   return !$start || getDaysUntil( $start ) <= 0;
 }
 
-sub hasPriority {
-  my $todo = $_[ 0 ];
-  return defined( $_[ 0 ]->{ 'priorityText' } );
-}
-
 sub addTag {
   my ( $todo, $key, $value ) = @_;
 
