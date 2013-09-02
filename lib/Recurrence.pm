@@ -49,7 +49,7 @@ sub advanceRecurrence {
     TodoTxt::setTagValue( $clone, 't', $newStartDate->ymd );
   }
 
-  TodoTxt::setTag( $clone, 'due', $newDueDate->ymd );
+  TodoTxt::setTagValue( $clone, 'due', $newDueDate->ymd );
 
   return $clone;
 }
