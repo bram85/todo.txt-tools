@@ -16,6 +16,8 @@
 
 package TodoTxt;
 
+use strict;
+
 use Storable;
 use Time::Piece;
 

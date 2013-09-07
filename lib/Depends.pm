@@ -16,6 +16,8 @@
 
 package TodoTxt;
 
+use strict;
+
 use TodoTxt;
 
 sub getTaskByID {
