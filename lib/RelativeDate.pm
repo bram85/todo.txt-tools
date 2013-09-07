@@ -89,7 +89,7 @@ sub convertRelativeDateString {
 }
 
 sub isRelativeDatePattern {
-  return $_[ 0 ] =~ /^(\d+[dwmy]|today|tomorrow|mon(day)?|tue(sday)?|wed(nesday)?|thu(rsday)?|fri(day)?|sat(day)?|sun(day)?)$/i;
+  return $_[ 0 ] =~ /^(\d+[dwmy]|today|tomorrow|mon(day)?|tue(sday)?|wed(nesday)?|thu(rsday)?|fri(day)?|sat(urday)?|sun(day)?)$/i;
 }
 
 1;
