@@ -14,27 +14,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-package TodoTxt;
-
-use strict;
-
-use Storable;
-use Time::Piece;
-
-use lib 'lib';
-use TodoTxt;
-use RelativeDate;
-
-sub advanceRecurrence {
-  my $todo = $_[ 0 ];
-  my $clone = Storable::dclone( $todo );
-
-  my $recurrence = TodoTxt::getTagValue( $todo, 'rec' );
-
-  my $newDueDate = TodoTxt::convertRelativeDate( $recurrence );
-  TodoTxt::advanceDates( $clone, $newDueDate );
-
-  return $clone;
-}
+use constant {
+  DAY => 60 * 60 * 24,
+  WEEK => 60 * 60 * 24 * 7
+};
 
 1;

@@ -21,6 +21,9 @@ use POSIX;
 use Time::Piece;
 use Time::Seconds;
 
+use lib 'lib';
+use Constants;
+
 my @todos;
 
 sub getTodo {
@@ -286,6 +289,31 @@ sub writeTodos {
 sub printTodo {
   my $todo = $_[ 0 ];
   print $todo->{ 'src' } . "\n";
+}
+
+sub getLength {
+  my $todo = $_[ 0 ];
+
+  return 0 unless hasTag( $todo, 't' ) && hasTag( $todo, 'due' );
+
+  my $startString = getTagValue( $todo, 't' );
+  my $start = parseDate( $startString );
+  my $dueString = getTagValue( $todo, 'due' );
+  my $due = parseDate( $dueString );
+
+  return getDateDifference( $start, $due );
+}
+
+sub advanceDates {
+  my ( $todo, $dueDate ) = @_;
+  $dueDate = parseDate( $dueDate ) if isDate( $dueDate );
+
+  if ( hasTag( $todo, 't' ) ) {
+    my $startDate = $dueDate - DAY * getLength( $todo );
+    setTagValue( $todo, 't', $startDate->ymd );
+  }
+
+  TodoTxt::setTagValue( $todo, 'due', $dueDate->ymd );
 }
 
 1;

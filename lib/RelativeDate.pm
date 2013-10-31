@@ -18,10 +18,8 @@ package TodoTxt;
 
 use strict;
 
-use constant {
-  DAY => 60 * 60 * 24,
-  WEEK => 60 * 60 * 24 * 7
-};
+use lib 'lib';
+use Constants;
 
 sub convertPattern {
   my $pattern = $_[ 0 ];

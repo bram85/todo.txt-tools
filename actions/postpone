@@ -27,31 +27,45 @@ use RelativeDate;
 my $filename = $ENV{ 'TODO_DIR' } . "/todo.txt";
 my $todos = TodoTxt::readTodos( $filename );
 
+my $withStartDate = $ARGV[ 1 ] eq '-s';
+shift @ARGV if $withStartDate;
+
 sub usage {
   print STDERR <<END;
-Usage: todo.sh postpone TASK#[,TASK#,...] <date>
-       todo.sh postpone TASK#[,TASK#,...] <pattern>
+Usage: todo.sh postpone [-s] TASK#[,TASK#,...] <date>
+       todo.sh postpone [-s] TASK#[,TASK#,...] <pattern>
 
-Example:
+Examples:
        todo.sh postpone 1 1w
        Postpones task 1 with one week.
+
+       todo.sh postpone -s 1 1w
+       Postpones task 1 with one week, including the start date.
 END
   exit 1;
 }
 
-sub setNewDueDate {
-  my ( $todo, $date ) = @_;
+sub getDueDate {
+  my ( $date, $offset ) = @_;
 
-  my $due = TodoTxt::getTagValue( $todo, 'due' );
-  my $newDate = TodoTxt::isDate( $date ) ? $date : TodoTxt::convertRelativeDateString( $date, $due );
+  return TodoTxt::isDate( $date ) ? $date : TodoTxt::convertRelativeDateString( $date, $offset );
+}
 
-  TodoTxt::setTagValue( $todo, 'due', $newDate );
+sub advanceDate {
+  my ( $todo, $newDueDate ) = @_;
+
+  if ( $withStartDate ) {
+    TodoTxt::advanceDates( $todo, $newDueDate );
+  }
+  else {
+    TodoTxt::setTagValue( $todo, 'due', $newDueDate );
+  }
 }
 
 my @numbers = grep { /\d+/ } split( ',', $ARGV[ 1 ] );
-my $date = $ARGV[2 ];
+my $inputDate = $ARGV[ 2 ];
 
-if ( !@numbers || ( !TodoTxt::isDate( $date ) && !TodoTxt::isRelativeDatePattern( $date ) ) ) {
+if ( !@numbers || ( !TodoTxt::isDate( $inputDate ) && !TodoTxt::isRelativeDatePattern( $inputDate ) ) ) {
   usage();
 }
 
@@ -69,7 +83,10 @@ foreach my $number ( @numbers ) {
     next;
   }
 
-  setNewDueDate( $todo, $date );
+  my $currentDueDate = TodoTxt::getTagValue( $todo, 'due' );
+  my $newDueDate = getDueDate( $inputDate, $currentDueDate );
+
+  advanceDate( $todo, $newDueDate );
   TodoTxt::printTodo( $todo );
   $dirty = 1;
 }
