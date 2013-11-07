@@ -22,13 +22,8 @@ use Getopt::Std;
 use Time::Piece;
 
 use lib 'lib';
+use Importance;
 use TodoTxt;
-
-my %priority = (
-  'A' => 3,
-  'B' => 2,
-  'C' => 1
-);
 
 my %option;
 getopts( "s:", \%option );
@@ -38,49 +33,6 @@ my @sortOrder = ( 'priority' );
 
 # default to sort by priority
 push( @sortOrder, 'desc:priority' ) unless scalar @sortOrder;
-
-sub getPriorityValue {
-  $_[ 0 ] =~ /([A-C])/;
-  return defined( $priority{ $1 } ) ? $priority{ $1 } : 0;
-}
-
-sub getImportance {
-  my $todo = $_[ 0 ];
-  my $ignoreWeekends = $_[ 1 ];
-  $ignoreWeekends = 0 unless defined( $ignoreWeekends );
-
-  my $importance = 2;
-
-  $importance += getPriorityValue( $todo->{ 'priority' } );
-
-  # auto-viv is not a problem here
-  $importance++ if TodoTxt::hasTagValue( $todo, 'star', 1 );
-
-  if ( TodoTxt::hasTag( $todo, 'due' ) ) {
-    my $daysLeft = TodoTxt::getDaysLeft( $todo );
-
-    $importance += 1 if ( $daysLeft >= 7 && $daysLeft < 14 );
-    $importance += 2 if ( $daysLeft >= 2 && $daysLeft < 7 );
-    $importance += 3 if ( $daysLeft >= 1 && $daysLeft < 2 );
-    $importance += 5 if ( $daysLeft >= 0 && $daysLeft < 1 );
-    $importance += 6 if ( $daysLeft < 0 );
-
-    if ( $ignoreWeekends ) {
-      # add compensation when the next working day is a Monday, add one to
-      # importance
-
-      my $now = localtime();
-      my $dueString = TodoTxt::getTagValue( $todo, 'due' );
-      my $due = TodoTxt::parseDate( $dueString );
-      my $diff = $due - $now;
-
-      # between Friday 0:00 and Monday 23:59 (a span of less than 4 days)
-      $importance += 1 if ( $now->wday == 6 || $now->wday == 7 ) && $due->wday == 2 && $diff->days < 4;
-    }
-  }
-
-  return $importance;
-}
 
 sub isDescending {
   return $_[ 0 ] =~ /^desc:/;
@@ -127,8 +79,8 @@ sub sortTodos {
     my $sortItem = getSortItem( $rawSortItem );
 
     # no switch/given statement, I need to run this on ancient Perl.
-    $result = getImportance( $a, 0 ) <=> getImportance( $b, 0 )         if $sortItem eq 'importance';
-    $result = getImportance( $a, 1 ) <=> getImportance( $b, 1 )         if $sortItem eq 'importance-no-wknd';
+    $result = TodoTxt::getImportance( $a, 0 ) <=> TodoTxt::getImportance( $b, 0 )         if $sortItem eq 'importance';
+    $result = TodoTxt::getImportance( $a, 1 ) <=> TodoTxt::getImportance( $b, 1 )         if $sortItem eq 'importance-no-wknd';
     $result = TodoTxt::getDaysLeft( $a ) <=> TodoTxt::getDaysLeft( $b ) if $sortItem eq 'due';
     $result = sortOnOptionalField( "description" )                      if $sortItem eq 'description';
     $result = sortOnPriority( $a, $b )                                  if $sortItem eq 'priority';
