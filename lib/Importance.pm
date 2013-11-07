@@ -21,6 +21,7 @@ use strict;
 package TodoTxt;
 
 use lib 'lib';
+use Depends;
 use TodoTxt;
 
 my %priority = (
@@ -70,6 +71,21 @@ sub getImportance {
   }
 
   return $importance;
+}
+
+sub getAverageImportance {
+  my $todo = $_[ 0 ];
+  my $ignoreWeekends = $_[ 1 ];
+
+  my $ownImportance = getImportance( $todo, $ignoreWeekends );
+  my @parents = TodoTxt::getParents( $todo );
+
+  my $sum = $ownImportance;
+  $sum += $_ foreach map { getImportance( $_, $ignoreWeekends ) } @parents;
+
+  my $average = $sum / ( 1 + @parents );
+
+  return $average > $ownImportance ? $average : $ownImportance;
 }
 
 1;

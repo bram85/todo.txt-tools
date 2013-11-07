@@ -81,6 +81,8 @@ sub sortTodos {
     # no switch/given statement, I need to run this on ancient Perl.
     $result = TodoTxt::getImportance( $a, 0 ) <=> TodoTxt::getImportance( $b, 0 )         if $sortItem eq 'importance';
     $result = TodoTxt::getImportance( $a, 1 ) <=> TodoTxt::getImportance( $b, 1 )         if $sortItem eq 'importance-no-wknd';
+    $result = TodoTxt::getAverageImportance( $a, 0 ) <=> TodoTxt::getAverageImportance( $b, 0 )         if $sortItem eq 'importance-average';
+    $result = TodoTxt::getAverageImportance( $a, 1 ) <=> TodoTxt::getAverageImportance( $b, 1 )         if $sortItem eq 'importance-average-no-wknd';
     $result = TodoTxt::getDaysLeft( $a ) <=> TodoTxt::getDaysLeft( $b ) if $sortItem eq 'due';
     $result = sortOnOptionalField( "description" )                      if $sortItem eq 'description';
     $result = sortOnPriority( $a, $b )                                  if $sortItem eq 'priority';

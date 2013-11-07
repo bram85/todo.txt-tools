@@ -103,6 +103,32 @@ sub getDirectDependencies {
   return getDependencies( $_[ 0 ], 0 );
 }
 
+sub getParents {
+  my $child = $_[ 0 ];
+  my $recursive = defined( $_[ 1 ] ) ? $_[ 1 ] : 1;
+
+  my @result = ();
+  my @stack = ( $child );
+
+  while ( @stack ) {
+    my $todo = pop @stack;
+    my @p = grep { $_ } map { getTaskByID( $_ ) } TodoTxt::getTagValues( $todo, 'p' );
+
+    next unless @p;
+
+    foreach my $p ( @p ) {
+      unless ( todoEquals( $child, $p ) || arrayHasTodo( \@result, $p ) ) {
+        push( @result, $p );
+        push( @stack, $p );
+      }
+    }
+
+    last unless $recursive;
+  }
+
+  return @result;
+}
+
 sub addDependency {
   my ( $fromTask, $toTask ) = @_;
 
