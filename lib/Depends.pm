@@ -18,6 +18,8 @@ package TodoTxt;
 
 use strict;
 
+use Memoize;
+
 use TodoTxt;
 
 sub getTaskByID {
@@ -29,6 +31,7 @@ sub getTaskByID {
   # there is only one such task, return first one
   return @result ? $result[ 0 ] : 0;
 }
+memoize( 'getTaskByID' );
 
 sub taskExistsDependingOnID {
   my $id = $_[ 0 ];

@@ -20,6 +20,8 @@ use strict;
 
 package TodoTxt;
 
+use Memoize;
+
 use lib 'lib';
 use Depends;
 use TodoTxt;
@@ -72,6 +74,7 @@ sub getImportance {
 
   return $importance;
 }
+memoize( 'getImportance' );
 
 sub getAverageImportance {
   my $todo = $_[ 0 ];
