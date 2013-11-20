@@ -83,8 +83,9 @@ foreach my $number ( @numbers ) {
     next;
   }
 
-  my $currentDueDate = TodoTxt::getTagValue( $todo, 'due' );
-  my $newDueDate = getDueDate( $inputDate, $currentDueDate );
+  my $overdue = TodoTxt::isOverdue( $todo );
+  my $offset = $overdue ? localtime()->ymd : TodoTxt::getTagValue( $todo, 'due' );
+  my $newDueDate = getDueDate( $inputDate, $offset );
 
   advanceDate( $todo, $newDueDate );
   TodoTxt::printTodo( $todo );
