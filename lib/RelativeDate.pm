@@ -40,8 +40,8 @@ sub convertWordPattern {
   my $pattern = $_[ 0 ];
   my $offset = localtime();
 
-  return convertPattern( "0d", $offset ) if $pattern eq "today";
-  return convertPattern( "1d", $offset ) if $pattern eq "tomorrow";
+  return convertPattern( "0d", $offset ) if $pattern =~ /tod(ay)?/i;
+  return convertPattern( "1d", $offset ) if $pattern =~ /tom(orrow)?/i;
 }
 
 sub convertWeekdayPattern {
@@ -49,7 +49,7 @@ sub convertWeekdayPattern {
   my $offset = localtime();
 
   my $day = $offset->day;
-  while ( $targetDay !~ /$day/i ) {
+  while ( $targetDay !~ /$day/i && $day !~ /$targetDay/i ) {
     $offset += DAY;
     $day = $offset->day;
   }
@@ -65,7 +65,7 @@ sub convertRelativeDate {
   if ( $pattern =~ /^\d+[dwmy]$/i ) {
     $offset = convertPattern( $pattern, $offset );
   }
-  elsif ( $pattern =~ /^(today|tomorrow)$/i ) {
+  elsif ( $pattern =~ /^(tod(ay)?|tom(orrow)?)$/i ) {
     $offset = convertWordPattern( $pattern );
   }
   else {
@@ -87,7 +87,7 @@ sub convertRelativeDateString {
 }
 
 sub isRelativeDatePattern {
-  return $_[ 0 ] =~ /^(\d+[dwmy]|today|tomorrow|mon(day)?|tue(sday)?|wed(nesday)?|thu(rsday)?|fri(day)?|sat(urday)?|sun(day)?)$/i;
+  return $_[ 0 ] =~ /^(\d+[dwmy]|tod(ay)?|tom(orrow)?|mo(n(day)?)?|tu(e(sday)?)?|we(d(nesday)?)?|th(u(rsday)?)?|fr(i(day)?)?|sa(t(urday)?)?|su(n(day)?)?)$/i;
 }
 
 1;
