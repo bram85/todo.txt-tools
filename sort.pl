@@ -88,6 +88,7 @@ sub sortTodos {
     $result = sortOnPriority( $a, $b )                                  if $sortItem eq 'priority';
     $result = sortOnOptionalField( "createdOn", $a, $b )                if $sortItem eq 'creation';
     $result = sortOnOptionalField( "start", $a, $b )                    if $sortItem eq 'start' || $sortItem eq 't';
+    $result = sortOnOptionalField( "l", $a, $b )                        if $sortItem eq 'length' || $sortItem eq 'l';
 
     $result = swapSortResult( $result ) if isDescending( $rawSortItem );
 
