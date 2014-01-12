@@ -27,8 +27,18 @@ use Constants;
 my @todos;
 
 sub getTodo {
-  my $taskNumber = $_[ 0 ];
-  return $taskNumber > 0 && $taskNumber <= scalar @todos ? $todos[ $taskNumber - 1 ] : undef;
+  my $taskSpecifier = $_[ 0 ];
+  my $todo = undef;
+
+  if ( $taskSpecifier =~ /^\d+$/ ) {
+    $todo = $taskSpecifier > 0 && $taskSpecifier <= scalar @todos ? $todos[ $taskSpecifier - 1 ] : undef;
+  }
+  else {
+    my @candidates = grep { $_->{ 'description' } =~ /$taskSpecifier/i } @todos;
+    $todo = $candidates[ 0 ] if scalar @candidates == 1;
+  }
+
+  return $todo;
 }
 
 sub parseDate {

@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!/home/brschoen/cadbin/perl
 
 # TodoTxt Tools
 # Copyright (C) 2013 Bram Schoenmakers <me@bramschoenmakers.nl>
@@ -56,14 +56,23 @@ sub executeTodoSh {
   print `$fullCommand`;
 }
 
-usage() unless $ARGV[ 1 ] =~ /^\d+(,\d+)*$/;
+usage() if scalar @ARGV == 0;
 
 my $force = $ENV{ 'TODOTXT_FORCE' };
 
 my $filename = $ENV{ 'TODO_DIR' } . "/todo.txt";
 TodoTxt::readTodos( $filename );
 
-my @todos = map { TodoTxt::getTodo( $_ ) } split( ',', $ARGV[ 1 ] );
+my @todos;
+
+if ( $ARGV[ 1 ] =~ /^\d+(,\d+)*$/ ) {
+  # match one or multiple task numbers, similar to todo.sh
+  @todos = map { TodoTxt::getTodo( $_ ) } split( ',', $ARGV[ 1 ] );
+}
+else {
+  # match the whole pattern
+  @todos = TodoTxt::getTodo( $ARGV[ 1 ] );
+}
 
 ################
 # Dependencies #
@@ -92,4 +101,4 @@ foreach my $todo ( grep { TodoTxt::hasTag( $_, 'rec' ) } @todos ) {
 # Mark as done #
 ################
 
-executeTodoSh( "do " . join( ',', map { $_->{ 'num' } } @todos ) );;
+executeTodoSh( "do " . join( ',', map { $_->{ 'num' } } @todos ) );
