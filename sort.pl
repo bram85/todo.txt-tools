@@ -43,7 +43,7 @@ sub getSortItem {
   return $3;
 }
 
-sub sortOnOptionalField {
+sub sortByOptionalField {
   my ( $field, $a, $b ) = @_;
   my $result = 0;
 
@@ -66,11 +66,11 @@ sub swapSortResult {
   return 0;
 }
 
-sub sortOnPriority {
+sub sortByPriority {
   my ( $a, $b ) = @_;
 
-  # swap because priority value is inverse to charecter value
-  return swapSortResult( sortOnOptionalField( "priority", $a, $b ) );
+  # swap because priority value is inverse to character value
+  return swapSortResult( sortByOptionalField( "priority", $a, $b ) );
 }
 
 sub sortTodos {
@@ -84,11 +84,11 @@ sub sortTodos {
     $result = TodoTxt::getAverageImportance( $a, 0 ) <=> TodoTxt::getAverageImportance( $b, 0 )         if $sortItem eq 'importance-average';
     $result = TodoTxt::getAverageImportance( $a, 1 ) <=> TodoTxt::getAverageImportance( $b, 1 )         if $sortItem eq 'importance-average-no-wknd';
     $result = TodoTxt::getDaysLeft( $a ) <=> TodoTxt::getDaysLeft( $b ) if $sortItem eq 'due';
-    $result = sortOnOptionalField( "description" )                      if $sortItem eq 'description';
-    $result = sortOnPriority( $a, $b )                                  if $sortItem eq 'priority';
-    $result = sortOnOptionalField( "createdOn", $a, $b )                if $sortItem eq 'creation';
-    $result = sortOnOptionalField( "start", $a, $b )                    if $sortItem eq 'start' || $sortItem eq 't';
-    $result = sortOnOptionalField( "l", $a, $b )                        if $sortItem eq 'length' || $sortItem eq 'l';
+    $result = sortByOptionalField( "description" )                      if $sortItem eq 'description';
+    $result = sortByPriority( $a, $b )                                  if $sortItem eq 'priority';
+    $result = sortByOptionalField( "createdOn", $a, $b )                if $sortItem eq 'creation';
+    $result = sortByOptionalField( "start", $a, $b )                    if $sortItem eq 'start' || $sortItem eq 't';
+    $result = sortByOptionalField( "l", $a, $b )                        if $sortItem eq 'length' || $sortItem eq 'l';
 
     $result = swapSortResult( $result ) if isDescending( $rawSortItem );
 
