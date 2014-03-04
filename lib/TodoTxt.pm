@@ -298,7 +298,12 @@ sub writeTodos {
 
 sub printTodo {
   my $todo = $_[ 0 ];
-  print $todo->{ 'src' } . "\n";
+  my $simple = $_[ 1 ];
+
+  $simple = 0 unless defined( $simple );
+
+  print $todo->{ 'src' } . "\n" unless $simple;
+  print $todo->{ 'description' } . "\n" if $simple;
 }
 
 sub getLength {
