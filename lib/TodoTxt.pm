@@ -1,5 +1,5 @@
 # TodoTxt Tools
-# Copyright (C) 2013 Bram Schoenmakers <me@bramschoenmakers.nl>
+# Copyright (C) 2013-2014 Bram Schoenmakers <me@bramschoenmakers.nl>
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -167,7 +167,7 @@ sub getTagValues {
 
 sub isOverdue {
   my $todo = $_[ 0 ];
-  return !hasTag( $todo, 'due' ) || getDaysLeft( $todo ) < 0;
+  return hasTag( $todo, 'due' ) && getDaysLeft( $todo ) < 0;
 }
 
 sub isActive {
