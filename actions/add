@@ -39,6 +39,14 @@ unless ( defined( $creation ) ) {
   $text = sprintf( "%s%s %s", $priority, $date, $remainder );
 }
 
+####################################################################
+# Put priority to the start, if it doesn't appear at the beginning #
+####################################################################
+
+if ( !defined( $priority ) && $text =~ /^(.+) (\([A-Z]\))(.*)$/ ) {
+  $text = sprintf( "%s %s%s", $2, $1, $3 );
+}
+
 ################################################
 # Substitute relative dates with absolute ones #
 ################################################
