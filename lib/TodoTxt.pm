@@ -133,7 +133,7 @@ sub getDaysUntil {
 
 sub getDaysLeft {
   my $todo = $_[ 0 ];
-  my $due = getTagValue( $todo, 'due' );
+  my $due = getTagValue( $todo, 'due', '2038-01-17' );
   return getDaysUntil( $due );
 }
 
@@ -152,10 +152,10 @@ sub hasTagValue {
 }
 
 sub getTagValue {
-  my ( $todo, $key ) = @_;
+  my ( $todo, $key, $default ) = @_;
 
   my @values = getTagValues( $todo, $key );
-  return @values ? $values[ 0 ] : undef;
+  return @values ? $values[ 0 ] : $default;
 }
 
 sub getTagValues {
