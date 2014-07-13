@@ -30,7 +30,8 @@ sub usage {
 
 usage() if scalar @ARGV == 1;
 
-my $text = $ARGV[ 1 ];
+shift @ARGV; # remove the 'add' subcommand from the arguments
+my $text = join( ' ', @ARGV );
 
 #################################
 # Add creation date, if missing #
