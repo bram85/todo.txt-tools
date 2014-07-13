@@ -23,6 +23,13 @@ use lib 'lib';
 use TodoTxt;
 use RelativeDate;
 
+sub usage {
+  print "Usage: todo.sh add \"THING I NEED TO DO +project \@context\"\n";
+  exit 1;
+}
+
+usage() if scalar @ARGV == 1;
+
 my $text = $ARGV[ 1 ];
 
 #################################
