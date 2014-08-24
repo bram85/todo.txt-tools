@@ -49,6 +49,15 @@ sub convertWeekdayPattern {
   my $offset = localtime();
 
   my $day = $offset->day;
+
+  # Don't recur today.  If today matches, then advance so we'll get the next
+  # matching day.
+  if( $targetDay =~ /$day/i ) {
+    $offset += DAY;
+    $day = $offset->day;
+  }
+
+
   while ( $targetDay !~ /$day/i && $day !~ /$targetDay/i ) {
     $offset += DAY;
     $day = $offset->day;
