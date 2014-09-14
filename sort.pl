@@ -89,6 +89,7 @@ sub sortTodos {
     $result = sortByOptionalField( "createdOn", $a, $b )                if $sortItem eq 'creation';
     $result = sortByOptionalField( "start", $a, $b )                    if $sortItem eq 'start' || $sortItem eq 't';
     $result = sortByOptionalField( "l", $a, $b )                        if $sortItem eq 'length' || $sortItem eq 'l';
+    $result = TodoTxt::isCompleted( $a ) <=> TodoTxt::isCompleted( $b ) if $sortItem eq 'completed';
 
     $result = swapSortResult( $result ) if isDescending( $rawSortItem );
 
