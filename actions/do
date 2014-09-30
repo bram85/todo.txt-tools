@@ -28,6 +28,9 @@ sub usage {
   exit 1;
 }
 
+my $strictMode = $ARGV[ 1 ] eq '-s';
+shift @ARGV if $strictMode;
+
 sub confirmDepsDone {
   my $subtasks = $_[ 0 ];
 
@@ -90,7 +93,12 @@ if ( scalar keys %$subtasks && !$force && confirmDepsDone( $subtasks ) ) {
 ##############
 
 foreach my $todo ( grep { TodoTxt::hasTag( $_, 'rec' ) } @todos ) {
-  my $newTodo = TodoTxt::advanceRecurrence( $todo );
+  my $recMode = 'normal';
+  if ( $strictMode ) {
+    $recMode = 'strict';
+  }
+
+  my $newTodo = TodoTxt::advanceRecurrence( $todo, $recMode ); 
 
   printf( "Recurring: %s", $todo->{ 'src' } . "\n" );
 

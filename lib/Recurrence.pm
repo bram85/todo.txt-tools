@@ -27,11 +27,17 @@ use RelativeDate;
 
 sub advanceRecurrence {
   my $todo = $_[ 0 ];
+  my $recMode = defined( $_[ 1 ] ) ? $_[ 1 ] : 'normal';
   my $clone = Storable::dclone( $todo );
 
   my $recurrence = TodoTxt::getTagValue( $todo, 'rec' );
 
   my $newDueDate = TodoTxt::convertRelativeDate( $recurrence );
+  if ( $recMode eq 'strict' ) {
+    my $curDueDate = TodoTxt::getTagValue( $todo, 'due' );
+    $newDueDate = TodoTxt::convertRelativeDateString( $recurrence, $curDueDate );
+  }
+
   TodoTxt::advanceDates( $clone, $newDueDate );
 
   return $clone;
